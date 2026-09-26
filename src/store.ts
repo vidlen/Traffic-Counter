@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { Session } from './types';
 
 // State UI global (bukan data survei — data survei ada di Dexie).
 export interface Toast {
@@ -30,3 +31,18 @@ export const useUi = create<UiState>((set) => ({
 }));
 
 export const toast = (text: string, tone?: Toast['tone']) => useUi.getState().toast(text, tone);
+
+// Draf wizard sesi: bertahan saat pindah langkah / halaman, dibuang setelah disimpan.
+interface WizardState {
+  draft: Session | null;
+  mode: 'new' | 'edit';
+  setDraft: (draft: Session | null, mode?: 'new' | 'edit') => void;
+  patch: (p: Partial<Session>) => void;
+}
+
+export const useWizard = create<WizardState>((set) => ({
+  draft: null,
+  mode: 'new',
+  setDraft: (draft, mode = 'new') => set({ draft, mode }),
+  patch: (p) => set((s) => (s.draft ? { draft: { ...s.draft, ...p } } : s)),
+}));

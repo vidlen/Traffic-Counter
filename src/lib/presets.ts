@@ -1,3 +1,4 @@
+import { t } from '../i18n/id';
 import type { ClassificationTemplate, PkjiClass, VehicleType } from '../types';
 
 // Warna tombol: gelap-jenuh (teks putih, kontras ≥ 4,5:1) supaya terbaca di bawah matahari.
@@ -141,15 +142,7 @@ export interface TemplateError {
   message: string;
 }
 
-export const ERR = {
-  name: 'Nama klasifikasi wajib diisi.',
-  count: `Jumlah jenis harus 1 sampai ${MAX_VEHICLE_TYPES}.`,
-  code: 'Kode 1-5 huruf/angka.',
-  dupCode: 'Kode sudah dipakai jenis lain.',
-  typeName: 'Nama jenis wajib diisi.',
-  ekr: 'ekr harus angka lebih dari 0 (boleh kosong).',
-  color: 'Warna tidak valid.',
-};
+export const ERR = { ...t.validation, count: t.validation.count(MAX_VEHICLE_TYPES) };
 
 export function validateTemplate(tpl: Pick<ClassificationTemplate, 'name' | 'vehicleTypes'>) {
   const errors: TemplateError[] = [];

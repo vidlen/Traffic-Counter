@@ -4,7 +4,7 @@
 | ------------------------------- | ---------- | ------- |
 | M0 — Fondasi & deploy           | 26/09/2026 | Selesai |
 | M1 — Klasifikasi                | 26/09/2026 | Selesai |
-| M2 — Wizard sesi & jadwal       |            | Belum   |
+| M2 — Wizard sesi & jadwal       | 26/09/2026 | Selesai |
 | M3 — Layar hitung & mesin timer |            | Belum   |
 | M4 — Rekap di app               |            | Belum   |
 | M5 — Export Excel               |            | Belum   |
@@ -80,3 +80,34 @@
 - [ ] Duplikat → edit → simpan → muncul di daftar Kustom
 - [ ] Kode ganda / kosong ditolak
 - [ ] Hapus kustom bekerja
+
+---
+
+## M2 — Wizard sesi & jadwal (26/09/2026)
+
+**Dibuat**
+
+- `lib/schedule.ts`: `buildSchedule()` (Mulai sekarang: N interval / sampai jam, opsi mulai di kelipatan jam; Blok waktu: blok berurutan, boleh lewat tengah malam), `validateTiming()`, `previewSchedule()`.
+- `lib/time.ts`: format Indonesia (dd/mm/yyyy, HH.mm), rentang dengan tanggal bila beda hari, hitung mundur, `toExcelSerial()`.
+- `lib/session.ts`: sesi baru, duplikat pengaturan, aliran (arah / gerakan), helper posisi ruas & simpang.
+- **Wizard 5 langkah** (`/sesi/baru`, `/sesi/:id/edit`): Info → Tipe & posisi (ruas 1-2 arah; simpang 3/4 lengan, pilih lengan yang tidak ada, 1 lengan dihitung + gerakan LT/ST/RT/UT) → Klasifikasi & ekr (snapshot template, tabel ekr per sesi, tombol "Isi ekr dari padanan PKJI", peringatan ekr kosong) → Waktu (interval pembagi 60, Menerus/Blok/Manual, pratinjau jadwal) → Ringkasan & checklist. Langkah tersimpan di URL (`?langkah=n`) sehingga tombol back HP kembali ke langkah sebelumnya.
+- Sesi disimpan sebagai **DRAFT**; `navigator.storage.persist()` diminta saat simpan pertama.
+- Beranda: daftar sesi (aktif, draf, selesai), kartu dengan status, badge "Belum di-export" & "Mode uji", aksi Lanjutkan / Duplikat pengaturan / Hapus (konfirmasi ketik nama lokasi).
+
+**Tes:** `npm test` 24 lulus, termasuk semua tes jadwal wajib §14 (48 interval 06.00-18.00, alignToClock 07.13.20 → 07.15.00, blok Pagi/Siang/Sore, blok 22.00-02.00, tolak pembagi 60 / tumpang tindih / bukan kelipatan) dan `toExcelSerial` 07.15 → 0,302083.
+
+**Cara coba di HP:** Buat sesi baru → isi lokasi & surveyor → pilih Simpang 3 lengan → pilih Bina Marga, isi ekr kelas PKJI lalu "Isi ekr dari padanan PKJI" → Waktu: Blok waktu → cek pratinjau (32 interval, 06.00-06.15 s/d 17.45-18.00, 8 jam) → Simpan draf → muncul di Beranda bagian Draf.
+
+**Menyimpang / keputusan (mohon dicek)**
+
+- Urutan blok waktu mengikuti urutan input: blok pertama di tanggal sesi, blok berikutnya pada kemunculan jam mulainya setelah blok sebelumnya selesai. "Tumpang tindih" = rentang total > 24 jam (mis. 06.00-09.00 lalu 08.00-10.00).
+- "Sampai jam HH.mm" hanya membuat interval penuh; sisa waktu di ujung (bila tidak pas kelipatan) tidak dihitung.
+- Simpang 3 lengan: pengguna memilih arah lengan yang tidak ada (kunci posisi U/T/S/BR tetap bermakna).
+- Rentang waktu memakai tanda hubung biasa (`07.15-07.30`), bukan en dash.
+
+**Checklist uji M2**
+
+- [ ] Wizard menolak lanjut bila lokasi/surveyor kosong
+- [ ] Pratinjau jadwal sesuai (Mulai sekarang, Blok, lewat tengah malam)
+- [ ] Draf tersimpan, bisa dilanjutkan (edit), diduplikat, dihapus
+- [ ] Tombol back HP kembali ke langkah sebelumnya

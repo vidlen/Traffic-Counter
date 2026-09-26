@@ -5,6 +5,7 @@ import { ClassificationEditor } from './pages/ClassificationEditor';
 import { Classifications } from './pages/Classifications';
 import { Home } from './pages/Home';
 import { InstallGuide } from './pages/InstallGuide';
+import { SessionWizard } from './pages/SessionWizard';
 import { Settings } from './pages/Settings';
 
 // Hash router: aman di GitHub Pages (refresh tidak 404).
@@ -13,6 +14,8 @@ const router = createHashRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
+      { path: 'sesi/baru', element: <SessionWizard /> },
+      { path: 'sesi/:id/edit', element: <SessionWizard /> },
       { path: 'klasifikasi', element: <Classifications /> },
       { path: 'klasifikasi/:id', element: <ClassificationEditor /> },
       { path: 'pengaturan', element: <Settings /> },
