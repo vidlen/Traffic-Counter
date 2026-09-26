@@ -3,7 +3,7 @@
 | Milestone                       | Tanggal    | Status  |
 | ------------------------------- | ---------- | ------- |
 | M0 — Fondasi & deploy           | 26/09/2026 | Selesai |
-| M1 — Klasifikasi                |            | Belum   |
+| M1 — Klasifikasi                | 26/09/2026 | Selesai |
 | M2 — Wizard sesi & jadwal       |            | Belum   |
 | M3 — Layar hitung & mesin timer |            | Belum   |
 | M4 — Rekap di app               |            | Belum   |
@@ -50,3 +50,33 @@
 - [ ] Bisa di-install di Android (Chrome)
 - [ ] Bisa di-install di iPhone (Safari)
 - [ ] Terbuka offline setelah kunjungan pertama
+
+---
+
+## M1 — Klasifikasi (26/09/2026)
+
+**Dibuat**
+
+- `lib/presets.ts`: 4 preset bawaan (PKJI 2023, PKJI 2023 Perkotaan, Bina Marga Gol. 1-8, Sederhana), palet 14 warna tombol, `validateTemplate()`, `fillEkrFromPkji()` (untuk tombol "Isi ekr dari padanan PKJI" di M2), `textOn()` (teks putih/gelap otomatis).
+- Seed ke Dexie setiap DB dibuka (`on('ready')` → `bulkPut`), sehingga preset selalu sama dengan kode.
+- Halaman **Klasifikasi**: daftar bawaan + kustom, Lihat/Edit, Duplikat, Hapus (kustom; diblokir bila dipakai sesi BERJALAN/MENUNGGU).
+- **Editor kustom**: nama, kode, nama jenis, keterangan, ekr (koma desimal), masuk skr, padanan PKJI, warna, urutan ↑↓, tambah/hapus jenis, validasi (kode unik, 1-5 huruf/angka, maks. 14 jenis, min. 1). Preset bawaan tampil read-only dengan tombol Duplikat.
+
+**Tes:** `npm test` 12 lulus (seed, isi preset, ekr hanya MP = 1,00, KTB/G8/Lainnya tidak masuk skr, kontras semua warna ≥ 4,5:1, validasi, isi ekr dari padanan).
+
+**Cara coba di HP:** Beranda → Klasifikasi kendaraan → Duplikat "Bina Marga Gol. 1-8" → ubah kode jadi sama dengan jenis lain → Simpan (harus ditolak, baris bentrok ditandai merah) → perbaiki → Simpan.
+
+**Menyimpang / keputusan (mohon dicek)**
+
+- Preset Sederhana memakai kode `MTR`, `MBL`, `BUS`, `TRK`, `LAIN`; padanan PKJI hanya Motor → SM dan Mobil → MP (Bus/Truk/Lainnya dibiarkan tanpa padanan karena bisa masuk beberapa kelas).
+- Warna jenis dipilih dari palet 14 warna yang sudah diuji kontras (bukan color picker bebas) supaya tombol tetap terbaca di bawah matahari.
+- Kode dibandingkan tanpa beda huruf besar/kecil (`G5a` = `g5A`) untuk mencegah kolom Excel yang membingungkan.
+- Salinan preset disimpan dengan skema `KUSTOM`.
+- Keterangan singkat tiap jenis PKJI/Bina Marga perlu diverifikasi pemilik proyek (§15).
+
+**Checklist uji M1**
+
+- [ ] Preset tidak bisa diedit, hanya dilihat/diduplikat
+- [ ] Duplikat → edit → simpan → muncul di daftar Kustom
+- [ ] Kode ganda / kosong ditolak
+- [ ] Hapus kustom bekerja

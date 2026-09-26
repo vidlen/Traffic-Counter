@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router';
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { Toasts } from './components/Toasts';
 import { useUi } from './store';
 
 // Kerangka semua halaman: registrasi service worker (update hanya lewat banner di Beranda).
@@ -15,5 +16,10 @@ export function App() {
     setUpdate(needRefresh, () => void updateServiceWorker(true));
   }, [needRefresh, updateServiceWorker, setUpdate]);
 
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <Toasts />
+    </>
+  );
 }

@@ -6,6 +6,7 @@ import type {
   NoteEvent,
   Session,
 } from '../types';
+import { PRESETS } from './presets';
 
 export interface SettingRow {
   key: string;
@@ -30,6 +31,8 @@ export class TcDatabase extends Dexie {
       notes: 'id, sessionId, [sessionId+t]',
       settings: 'key',
     });
+    // Preset bawaan read-only: selalu disamakan dengan kode setiap kali DB dibuka.
+    this.on('ready', (vip) => vip.table('templates').bulkPut(PRESETS));
   }
 }
 
