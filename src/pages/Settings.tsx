@@ -64,6 +64,12 @@ export function Settings() {
             </div>
             <div className="divide-y divide-line border-t border-line">
               <Switch
+                label={ts.lockLandscape}
+                hint={ts.lockLandscapeHint}
+                checked={s.lockLandscape}
+                onChange={(lockLandscape) => set({ lockLandscape })}
+              />
+              <Switch
                 label={ts.vibration}
                 hint={ts.vibrationHint}
                 checked={s.vibration}

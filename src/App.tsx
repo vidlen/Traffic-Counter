@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect } from 'react';
-import { Outlet } from 'react-router';
+import { Outlet, useMatch } from 'react-router';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Toasts } from './components/Toasts';
 import { useSessionEngine } from './hooks/useCounterSession';
@@ -26,6 +26,9 @@ export function App() {
       .count(),
   );
   useSessionEngine();
+  // Layar hitung punya badge MODE UJI sendiri di bar atas.
+  const counter = useMatch('/sesi/:id');
+  const onCounter = !!counter && counter.params.id !== 'baru';
 
   useEffect(() => {
     setUpdate(needRefresh, () => void updateServiceWorker(true));
@@ -38,7 +41,7 @@ export function App() {
   return (
     <>
       <Outlet />
-      {(settings.testMode || !!testActive) && (
+      {(settings.testMode || !!testActive) && !onCounter && (
         <div className="pointer-events-none fixed top-[env(safe-area-inset-top)] left-1/2 z-50 -translate-x-1/2 rounded-b-lg bg-danger px-3 py-0.5 text-xs font-bold tracking-[0.2em] text-canvas">
           {t.counter.testBanner}
         </div>

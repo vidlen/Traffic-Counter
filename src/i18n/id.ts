@@ -237,7 +237,9 @@ export const t = {
     started: 'Interval dimulai',
     sessionDone: 'Sesi selesai',
     saveFailed: 'Gagal menyimpan ketukan. Periksa ruang penyimpanan HP.',
-    rotateHint: 'Putar HP ke landscape supaya tombol lebih besar.',
+    rotateHint: 'Tata letak utama untuk menghitung adalah landscape. Putar HP ke samping.',
+    goLandscape: 'Landscape',
+    battery: (n: number) => `Baterai ${n}%`,
     wakeLockHint:
       'HP ini tidak bisa menahan layar tetap menyala. Matikan kunci layar otomatis di pengaturan HP.',
     menu: 'Menu sesi',
@@ -493,6 +495,9 @@ export const t = {
     display: 'Tampilan & umpan balik',
     buttonSize: 'Ukuran tombol hitung',
     sizes: { NORMAL: 'Normal', BESAR: 'Besar', SANGAT_BESAR: 'Sangat besar' },
+    lockLandscape: 'Layar penuh & landscape saat menghitung',
+    lockLandscapeHint:
+      'Otomatis saat menekan Mulai / Lanjutkan (Android). Di iPhone putar HP secara manual.',
     vibration: 'Getar tiap ketukan',
     vibrationHint:
       'iPhone tidak mendukung getar dari web; diganti klik suara pendek bila Suara aktif.',

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { AppBar } from '../../components/AppBar';
-import { loadSettings } from '../../hooks/useSettings';
+import { enterLandscape, exitLandscape } from '../../hooks/useDevice';
+import { loadSettings, useSettings } from '../../hooks/useSettings';
 import { t } from '../../i18n/id';
 import { clock } from '../../lib/clock';
 import { db } from '../../lib/db';
@@ -43,6 +44,7 @@ export function SessionWizard() {
   const step = Math.min(STEPS.length, Math.max(1, Number(params.get('langkah')) || 1));
   const { draft, mode, setDraft, patch } = useWizard();
   const [showErrors, setShowErrors] = useState(false);
+  const { lockLandscape } = useSettings();
 
   useEffect(() => {
     let cancelled = false;
@@ -101,8 +103,12 @@ export function SessionWizard() {
   const start = async () => {
     if (!valid()) return;
     unlockAudio(); // gesture pengguna: izinkan bunyi akhir interval
+    if (lockLandscape) void enterLandscape(); // harus sebelum await pertama (butuh gesture)
     const error = await startSession({ ...draft, status: 'DRAFT' });
-    if (error) return toast(error, 'danger');
+    if (error) {
+      exitLandscape();
+      return toast(error, 'danger');
+    }
     void requestPersist();
     setDraft(null);
     navigate(`/sesi/${draft.id}`, { replace: true });

@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router';
 import { BrandMark } from '../components/BrandMark';
 import { DeleteSessionDialog } from '../components/DeleteSessionDialog';
 import { ExportDialog } from '../components/ExportDialog';
-import { loadSettings } from '../hooks/useSettings';
+import { enterLandscape } from '../hooks/useDevice';
+import { loadSettings, useSettings } from '../hooks/useSettings';
 import { useStorageStatus } from '../hooks/useStorageStatus';
 import { t } from '../i18n/id';
 import { clock } from '../lib/clock';
@@ -44,6 +45,7 @@ export function Home() {
   const [toExport, setToExport] = useState<Session | null>(null);
 
   const storage = useStorageStatus();
+  const { lockLandscape } = useSettings();
 
   const active = sessions?.filter(isActive) ?? [];
   const drafts = sessions?.filter((s) => s.status === 'DRAFT') ?? [];
@@ -69,6 +71,7 @@ export function Home() {
               onDuplicate={() => void duplicate(s)}
               onDelete={() => setToDelete(s)}
               onExport={() => setToExport(s)}
+              onContinue={() => isActive(s) && lockLandscape && void enterLandscape()}
             />
           ))}
         </ul>
@@ -168,12 +171,14 @@ function SessionCard({
   onDuplicate,
   onDelete,
   onExport,
+  onContinue,
 }: {
   s: Session;
   stats?: Stats;
   onDuplicate: () => void;
   onDelete: () => void;
   onExport: () => void;
+  onContinue: () => void;
 }) {
   const [more, setMore] = useState(false);
   const counted = s.positions
@@ -211,7 +216,7 @@ function SessionCard({
         </div>
       )}
       <div className="mt-4 flex gap-2">
-        <Link to={primary.to} className="btn btn-primary flex-1">
+        <Link to={primary.to} className="btn btn-primary flex-1" onClick={onContinue}>
           {primary.label}
         </Link>
         <button

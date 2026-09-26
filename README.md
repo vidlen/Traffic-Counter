@@ -31,6 +31,8 @@ Alamat: **https://vidlen.github.io/Traffic-Counter/**
 
 ### 3. Saat menghitung
 
+- **Tata letak utama: landscape.** Pegang HP menyamping dengan dua tangan. Ruas 2 arah: Arah A di kiri, Arah B di kanan, posisi tombol dicerminkan. **Dua jenis pertama** pada klasifikasi (mis. SM & MP) menjadi tombol besar di bawah (dekat ibu jari), jenis lain tombol kecil di atas. Undo / Koreksi / Catatan ada di kolom tengah. Simpang: baris = gerakan (LT/ST/RT), kolom = jenis. Urutan jenis bisa diatur di editor klasifikasi.
+- Di Android, app otomatis masuk layar penuh dan terkunci landscape saat menekan _Mulai_ / _Lanjutkan_ (bisa dimatikan di Pengaturan). Di iPhone putar HP sendiri. Posisi portrait tetap bisa dipakai.
 - Ketuk tombol jenis kendaraan: angka besar = interval ini, angka kecil = total sesi. Dua tombol boleh diketuk bersamaan.
 - **Undo**: membatalkan ketukan terakhir di interval berjalan.
 - **Koreksi**: aktifkan, lalu setiap ketukan mengurangi 1 (tombol bergaris merah; mati sendiri setelah 5 detik).

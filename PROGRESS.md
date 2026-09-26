@@ -267,3 +267,34 @@
 - Mesin interval tidak berjalan saat app tidak terlihat (keterbatasan browser); jeda dicatat lalu dipulihkan saat app dibuka lagi. Bunyi/getar mulai otomatis blok hanya terdengar bila app sedang terbuka.
 - Mengubah jam HP secara manual di tengah sesi tidak ditangani (gunakan jam otomatis).
 - Data hanya ada di HP yang dipakai; gabungkan antar-HP lewat sheet Data_Gabung.
+
+---
+
+## Perubahan: mode utama landscape (27/09/2026)
+
+Permintaan pemilik: layar hitung utama landscape seperti aplikasi hand counter (dua arah berdampingan, tombol besar untuk kendaraan paling sering).
+
+**Dibuat**
+
+- Layar hitung **landscape** (tata letak utama): bar atas tipis (menu, lokasi, interval, hitung mundur, total interval, baterai, jam HP, progres), ruas 2 arah = dua panel **dicerminkan** (Arah A kiri, Arah B kanan) dengan kolom tengah Undo / Koreksi / Catatan. Dua jenis pertama klasifikasi (SM, MP) = tombol besar di bawah, jenis pertama paling bawah (dekat ibu jari); jenis lain = tombol kecil di atas (maks. 5 per baris per arah). Ruas 1 arah memakai lebar penuh. Simpang: baris = gerakan, kolom = jenis (dua jenis pertama lebih lebar).
+- **Layar penuh + kunci landscape** otomatis saat menekan Mulai / Lanjutkan (Android; pengaturan "Layar penuh & landscape saat menghitung", default aktif), dilepas saat keluar layar hitung. iPhone: putar manual.
+- Portrait tetap tersedia sebagai cadangan, dengan ajakan memutar HP + tombol Landscape.
+- Toast di landscape tampil di atas (tidak menutupi tombol bawah); badge MODE UJI pindah ke bar layar hitung; persen baterai (Chrome Android).
+
+**Bug yang ditemukan & diperbaiki saat uji**
+
+- Selektor waktu di header layar hitung mengembalikan `clock.now()` ketika mesin belum berdetak → render berulang tanpa henti ("Maximum update depth exceeded"), tergantung waktu. Selektor kini mengembalikan nilai stabil.
+- Saran Wake Lock (HP tanpa dukungan) tidak lagi berupa overlay yang menutupi tombol; diganti toast sekali.
+
+**Diuji di browser (844 × 390):** ruas 2 arah PKJI (6 jenis), Bina Marga 12 jenis (10 tombol kecil, 2 baris × 5 per arah), simpang 3 gerakan, semuanya muat satu layar tanpa tombol < 56 px; pemberitahuan pemulihan muncul setelah pane tersembunyi > 15 detik. `npm test` 62 lulus, lint & build bersih.
+
+**Keputusan (mohon dicek)**
+
+- Tombol besar = dua jenis pertama menurut urutan klasifikasi (ubah urutan di editor untuk memilih jenis lain).
+- Ikon kendaraan seperti di gambar referensi belum ditambahkan (butuh library ikon baru, mis. `@phosphor-icons/react`, perlu persetujuan sesuai aturan dependency). Faktor pengali "car factor" pada gambar referensi juga tidak ditambahkan.
+
+**Checklist uji**
+
+- [ ] Android: Mulai → layar penuh + terkunci landscape; keluar layar hitung → kembali normal
+- [ ] iPhone: putar manual ke landscape, tata letak menyesuaikan (termasuk notch kiri/kanan)
+- [ ] Dua ibu jari: SM/MP mudah dijangkau, tombol kecil tidak tertekan tidak sengaja

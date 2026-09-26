@@ -140,6 +140,7 @@ export type ButtonSize = 'NORMAL' | 'BESAR' | 'SANGAT_BESAR';
 
 export interface AppSettings {
   buttonSize: ButtonSize;
+  lockLandscape: boolean; // layar penuh + kunci landscape saat menghitung (Android)
   vibration: boolean;
   sound: boolean;
   theme: 'TERANG' | 'GELAP';

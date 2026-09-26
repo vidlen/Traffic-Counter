@@ -2,6 +2,8 @@
 
 /* Tema: "aspal & marka". Satu aksen (kuning marka), netral dingin, kontras tinggi untuk terik. */
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+/* HP dalam posisi landscape (tinggi layar pendek). */
+@custom-variant landscape-phone (@media (orientation: landscape) and (max-height: 520px));
 
 @theme inline {
   --font-sans:

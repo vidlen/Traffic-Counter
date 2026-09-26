@@ -5,6 +5,7 @@ import type { AppSettings } from '../types';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   buttonSize: 'NORMAL',
+  lockLandscape: true,
   vibration: true,
   sound: true,
   theme: 'TERANG',
