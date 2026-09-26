@@ -3,6 +3,7 @@ import { lazy, type ReactNode, Suspense, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { AppBar, Page } from '../components/AppBar';
 import { EkrEditor } from '../components/EkrEditor';
+import { ExportDialog } from '../components/ExportDialog';
 import { Segmented } from '../components/Form';
 import { VehicleChip } from '../components/VehicleChip';
 import { useSettings } from '../hooks/useSettings';
@@ -51,6 +52,7 @@ export function Recap() {
   const { peakPeriods } = useSettings();
   const [tab, setTab] = useState<Tab>('interval');
   const [basisPref, setBasis] = useState<Basis | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const r = useMemo(
     () =>
@@ -129,7 +131,19 @@ export function Recap() {
         ) : (
           <NotesTab s={session} rows={r.rows} notes={notes} />
         )}
+        <div className="h-16" />
       </Page>
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-canvas px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <button
+          className="btn btn-primary mx-auto flex w-full max-w-xl"
+          onClick={() => setExporting(true)}
+        >
+          {tr.export}
+        </button>
+      </div>
+      {exporting && (
+        <ExportDialog key={session.id} session={session} onClose={() => setExporting(false)} />
+      )}
     </>
   );
 }

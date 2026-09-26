@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { BrandMark } from '../components/BrandMark';
 import { DeleteSessionDialog } from '../components/DeleteSessionDialog';
+import { ExportDialog } from '../components/ExportDialog';
 import { loadSettings } from '../hooks/useSettings';
 import { t } from '../i18n/id';
 import { clock } from '../lib/clock';
@@ -39,6 +40,7 @@ export function Home() {
   const sessions = useLiveQuery(() => db.sessions.orderBy('createdAt').reverse().toArray());
   const stats = useLiveQuery(async () => statsBySession(await db.intervals.toArray()));
   const [toDelete, setToDelete] = useState<Session | null>(null);
+  const [toExport, setToExport] = useState<Session | null>(null);
 
   const active = sessions?.filter(isActive) ?? [];
   const drafts = sessions?.filter((s) => s.status === 'DRAFT') ?? [];
@@ -62,6 +64,7 @@ export function Home() {
               stats={stats?.get(s.id)}
               onDuplicate={() => void duplicate(s)}
               onDelete={() => setToDelete(s)}
+              onExport={() => setToExport(s)}
             />
           ))}
         </ul>
@@ -125,6 +128,9 @@ export function Home() {
           onClose={() => setToDelete(null)}
         />
       )}
+      {toExport && (
+        <ExportDialog key={toExport.id} session={toExport} onClose={() => setToExport(null)} />
+      )}
     </div>
   );
 }
@@ -141,11 +147,13 @@ function SessionCard({
   stats,
   onDuplicate,
   onDelete,
+  onExport,
 }: {
   s: Session;
   stats?: Stats;
   onDuplicate: () => void;
   onDelete: () => void;
+  onExport: () => void;
 }) {
   const [more, setMore] = useState(false);
   const counted = s.positions
@@ -201,6 +209,11 @@ function SessionCard({
             <Link to={`/sesi/${s.id}/rekap`} className="btn btn-secondary">
               {th.recap}
             </Link>
+          )}
+          {s.status !== 'DRAFT' && (
+            <button className="btn btn-secondary" onClick={onExport}>
+              {th.export}
+            </button>
           )}
           <button className="btn btn-secondary" onClick={onDuplicate}>
             {th.duplicate}

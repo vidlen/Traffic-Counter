@@ -1,6 +1,7 @@
 import { type CSSProperties, memo, useState, useSyncExternalStore } from 'react';
 import { Link, Navigate, useParams } from 'react-router';
 import { AppBar, Page } from '../components/AppBar';
+import { ExportDialog } from '../components/ExportDialog';
 import { HoldButton } from '../components/HoldButton';
 import { Sheet } from '../components/Sheet';
 import { useBeforeUnload } from '../hooks/useBeforeUnload';
@@ -488,6 +489,7 @@ function NoteSheet({
 }
 
 function Finished({ s, records }: { s: Session; records: IntervalRecord[] }) {
+  const [exporting, setExporting] = useState(false);
   const closed = records.filter((r) => r.status !== 'TERBUKA');
   const vehicles = closed.reduce(
     (a, r) => a + Object.values(r.counts).reduce((x, y) => x + y, 0),
@@ -502,6 +504,9 @@ function Finished({ s, records }: { s: Session; records: IntervalRecord[] }) {
           <p className="mt-2 text-ink-2">{tc.finishedBody(closed.length, fmtNum(vehicles))}</p>
         </section>
         <div className="grid gap-2">
+          <button className="btn btn-accent h-14" onClick={() => setExporting(true)}>
+            {tc.exportExcel}
+          </button>
           <Link to={`/sesi/${s.id}/rekap`} className="btn btn-primary h-14">
             {tc.recap}
           </Link>
@@ -510,6 +515,7 @@ function Finished({ s, records }: { s: Session; records: IntervalRecord[] }) {
           </Link>
         </div>
       </Page>
+      {exporting && <ExportDialog key={s.id} session={s} onClose={() => setExporting(false)} />}
     </>
   );
 }

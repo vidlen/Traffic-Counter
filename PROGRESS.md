@@ -7,7 +7,7 @@
 | M2 — Wizard sesi & jadwal       | 26/09/2026 | Selesai |
 | M3 — Layar hitung & mesin timer | 27/09/2026 | Selesai |
 | M4 — Rekap di app               | 27/09/2026 | Selesai |
-| M5 — Export Excel               |            | Belum   |
+| M5 — Export Excel               | 27/09/2026 | Selesai |
 | M6 — Pengerasan lapangan        |            | Belum   |
 
 ---
@@ -185,3 +185,39 @@
 - [ ] Jam puncak & PHF sesuai hitungan manual
 - [ ] Toggle kend/skr dan editor ekr bekerja
 - [ ] Grafik tampil offline
+
+---
+
+## M5 — Export Excel (27/09/2026)
+
+**Dibuat**
+
+- `lib/excel/buildWorkbook.ts` (murni, tanpa DOM/Dexie) + `sheets/` satu file per sheet, urutan tetap: **Info_Survei, Klasifikasi, Data_Interval, Rekap_Jam, Grafik, Data_Gabung, Log_Ketukan** (Log_Ketukan opsional, default aktif). `fullCalcOnLoad = true`.
+- **Rumus live** + `result` hasil hitungan JS di setiap sel rumus. Hanya fungsi SUM, SUMPRODUCT, IF, OR, COUNT, COUNTBLANK, MAX (diuji otomatis terhadap daftar yang diizinkan).
+- Waktu ditulis sebagai **serial waktu lokal** (`toExcelSerial`), tidak pernah objek `Date`; format `dd/mm/yyyy`, `hh:mm`, `dd/mm/yyyy hh:mm:ss`.
+- Klasifikasi: sel ekr = sumber semua skr (ubah ekr di Excel → skr ikut berubah). Data_Interval: baris ekr di bawah header, blok per aliran lalu blok Total (rumus penjumlahan baris yang bersesuaian), Total kend/skr dengan penjaga `COUNT(...)=0` sehingga baris TERLEWAT kosong (bukan 0), warna baris sesuai status, catatan per interval. Rekap_Jam: A jam bulat, B jam bergerak (+ V maks), C jam puncak per periode + keseluruhan (baris dipilih app; volume, V maks, PHF, komposisi = rumus), D komposisi seluruh survei, E rasio belok (simpang). Data_Gabung: 19 kolom tetap, skr = `IF(OR(P2="",Q2=""),"",P2*Q2)` relatif baris, autofilter. Info_Survei: kunci-nilai, catatan kejadian, periode tidak aktif, legenda warna, cara gabung antar-HP, cap **DATA UJI** untuk Mode uji.
+- Freeze pane, lebar kolom, cetak landscape A4 muat selebar halaman.
+- `chartImage.ts`: Chart.js di kanvas tersembunyi 1600 × 800, latar putih, tanpa animasi → PNG (garis per interval; batang per jam bulat).
+- Nama file `TC_{lokasi}_{posisi}_{YYYYMMDD}_{surveyor}.xlsx` (disanitasi).
+- **Dialog Export** (dari Rekap, kartu Beranda, dan layar sesi selesai): opsi Log_Ketukan & basis jam puncak → Buat file (ExcelJS + Chart.js di-load dinamis) → **Bagikan** (bila `navigator.canShare({ files })`) / **Unduh** → `exportedAt` diisi → badge "Belum di-export" hilang.
+
+**Tes:** `npm test` 62 lulus. Excel (tulis → baca ulang dengan ExcelJS di Node): nama & urutan sheet, header Data_Interval & Data_Gabung, rumus ekr/Total kend/Total skr/blok Total + `result`, serial waktu (06.00 → pecahan 0,25; tanggal 46027), baris TERLEWAT kosong (dicek juga di XML mentah: `t="str"` + `<v></v>`), PHF live, Data_Gabung relatif baris, Klasifikasi Ya/Tidak & ekr kosong, Log_Ketukan TAP/UNDO/KOREKSI, fungsi yang dipakai, simpang (blok LT/ST/RT/Total lengan, pLT/pRT), ekr belum lengkap → skr kosong & basis kend, cap DATA UJI, sanitasi nama file.
+
+**Cara coba di HP:** Rekap → Export Excel → Buat file → Bagikan ke WhatsApp/Drive atau Unduh → buka di Excel / WPS / Google Sheets → ubah satu ekr di sheet Klasifikasi dan pastikan skr di Data_Interval & Rekap_Jam ikut berubah.
+
+**Menyimpang / keputusan (mohon dicek)**
+
+- Basis jam puncak di Excel dipilih di dialog export (default skr bila ekr lengkap). V maks interval dan PHF memakai basis yang sama.
+- Kolom Mulai/Selesai berisi serial tanggal+jam (tampil `hh:mm`) supaya tetap benar lewat tengah malam dan mudah digabung.
+- Kolom Posisi di Data_Gabung berisi nama posisi; Gerakan `-` untuk ruas; Durasi_Menit = panjang interval terjadwal.
+- Rentang di label jam memakai tanda hubung biasa (`07.15-08.15`).
+- Pembaca ExcelJS membuang hasil string kosong saat membaca file; file yang ditulis tetap berisi hasil kosong (terverifikasi di XML).
+
+**Checklist uji M5 (manual)**
+
+- [ ] File terbuka benar di Microsoft Excel
+- [ ] File terbuka benar di WPS Office (HP)
+- [ ] File terbuka benar di Google Sheets
+- [ ] Ubah ekr di Klasifikasi → skr berubah di Data_Interval & Rekap_Jam
+- [ ] Data_Gabung dari 2 HP bisa digabung lalu dibuat PivotTable
+- [ ] Bagikan ke WhatsApp dan Drive dari HP

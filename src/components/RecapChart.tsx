@@ -92,6 +92,7 @@ export default function RecapChart({
         <Line
           data={data}
           options={{
+            locale: 'id-ID',
             maintainAspectRatio: false,
             animation: false,
             spanGaps: false,
