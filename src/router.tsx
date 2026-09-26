@@ -6,6 +6,7 @@ import { Counter } from './pages/Counter';
 import { Classifications } from './pages/Classifications';
 import { Home } from './pages/Home';
 import { InstallGuide } from './pages/InstallGuide';
+import { Recap } from './pages/Recap';
 import { SessionWizard } from './pages/SessionWizard';
 import { Settings } from './pages/Settings';
 
@@ -18,6 +19,7 @@ const router = createHashRouter([
       { path: 'sesi/baru', element: <SessionWizard /> },
       { path: 'sesi/:id/edit', element: <SessionWizard /> },
       { path: 'sesi/:id', element: <Counter /> },
+      { path: 'sesi/:id/rekap', element: <Recap /> },
       { path: 'klasifikasi', element: <Classifications /> },
       { path: 'klasifikasi/:id', element: <ClassificationEditor /> },
       { path: 'pengaturan', element: <Settings /> },

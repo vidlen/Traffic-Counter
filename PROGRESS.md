@@ -6,7 +6,7 @@
 | M1 — Klasifikasi                | 26/09/2026 | Selesai |
 | M2 — Wizard sesi & jadwal       | 26/09/2026 | Selesai |
 | M3 — Layar hitung & mesin timer | 27/09/2026 | Selesai |
-| M4 — Rekap di app               |            | Belum   |
+| M4 — Rekap di app               | 27/09/2026 | Selesai |
 | M5 — Export Excel               |            | Belum   |
 | M6 — Pengerasan lapangan        |            | Belum   |
 
@@ -155,3 +155,33 @@
 - [ ] Dua tombol diketuk bersamaan → keduanya bertambah
 - [ ] Layar tidak mati selama menghitung (Wake Lock)
 - [ ] iPhone: klik suara sebagai pengganti getar
+
+---
+
+## M4 — Rekap di app (27/09/2026)
+
+**Dibuat**
+
+- `lib/aggregate.ts` (fungsi murni): baris interval per aliran + Total (kend, skr, per jenis), skr = Σ jumlah × ekr (kosong bila ekr belum lengkap; KTB tidak masuk skr), jam bulat, jam bergerak (n > 1), validitas (n interval, semua LENGKAP, berurutan tanpa celah, jam bulat harus tepat di jam), jam puncak per periode + keseluruhan (dari Total, basis kend/skr, seri → paling awal, jam tidak valid dipakai hanya bila tidak ada yang valid + tanda "*"), PHF, komposisi, rasio belok simpang. Interval TERLEWAT selalu kosong (bukan 0).
+- Halaman **Rekap** (`/sesi/:id/rekap`): tab Per interval (warna status, tanda "ada catatan", opsi per jenis) | Per jam (jam bulat, jam bergerak, kartu jam puncak dengan PHF, volume tiap aliran, komposisi; komposisi seluruh survei; rasio belok untuk simpang) | Grafik (Chart.js lazy-load: garis per aliran + Total, putus di interval TERLEWAT, segitiga = interval dengan catatan, filter jenis) | Catatan (catatan kejadian + periode tidak aktif).
+- Toggle **kend / skr** (skr hanya bila ekr lengkap); banner + editor ekr inline bila ekr belum lengkap, tombol "Ubah ekr" bila sudah. Mengubah ekr langsung menghitung ulang skr.
+- `src/test/fixtures.ts`: data survei contoh deterministik (blok Pagi + Sore, PARSIAL/TERPUTUS/TERLEWAT, undo, koreksi, catatan) untuk tes dan demo.
+
+**Tes:** `npm test` 52 lulus. Agregasi (§14): skr dengan ekr lengkap, skr kosong bila ekr kosong, KTB tidak masuk skr, TERLEWAT kosong; jam bergerak n = 4 (15 menit) dan n = 12 (5 menit), tidak dibuat untuk 60 menit; validitas; jam puncak per periode, seri → paling awal, jam tidak valid dikecualikan, periode lewat tengah malam; PHF 1.200 / (4 × 360) = 0,833; komposisi; rasio belok simpang.
+
+**Cara coba di HP:** selesaikan satu sesi (Mode uji) → Beranda → Rekap → cek keempat tab, ganti kend/skr, kosongkan satu ekr lalu isi lagi.
+
+**Menyimpang / keputusan (mohon dicek)**
+
+- Basis awal rekap = skr bila ekr lengkap, selain itu kend.
+- Jam bulat = interval dikelompokkan menurut jam tempat interval dimulai; valid hanya bila berisi n interval yang tepat mulai di jam bulat. Jadwal yang tidak mulai di kelipatan jam akan punya jam bulat "tidak valid" (jam bergerak tetap benar).
+- Jam puncak interval 60 menit memakai jam bulat (tanpa PHF).
+- Rasio belok dihitung pada jam puncak keseluruhan berbasis skr (butuh ekr lengkap).
+- Periode jam puncak ditentukan oleh jam mulai jendela.
+
+**Checklist uji M4**
+
+- [ ] Angka rekap per interval sama dengan hitungan manual
+- [ ] Jam puncak & PHF sesuai hitungan manual
+- [ ] Toggle kend/skr dan editor ekr bekerja
+- [ ] Grafik tampil offline

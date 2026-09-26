@@ -13,6 +13,9 @@ export interface Flow {
   label: string;
 }
 
+/** Warna garis grafik per aliran (urutan tetap); Total memakai warna tinta. */
+export const FLOW_COLORS = ['#1d4ed8', '#c2410c', '#15803d', '#6d28d9'];
+
 export const countKey = (positionKey: string, movement: Movement | null, code: string) =>
   `${positionKey}|${movement ?? '-'}|${code}`;
 

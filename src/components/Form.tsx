@@ -44,7 +44,7 @@ export function Segmented<T extends string | number>({
           type="button"
           role="radio"
           aria-checked={v === value}
-          className={`min-h-11 flex-1 rounded-lg px-2 text-sm font-semibold transition-colors ${
+          className={`min-h-11 flex-1 rounded-lg px-1 text-sm font-semibold whitespace-nowrap transition-colors ${
             v === value ? 'bg-surface text-ink shadow-[0_1px_2px_rgb(23_25_27/0.12)]' : 'text-ink-2'
           }`}
           onClick={() => onChange(v)}
