@@ -84,7 +84,8 @@ export function useSessionEngine(): void {
         const cur = before.current;
         if (cur && cur.start < gap.to)
           lines.push(tc.gapCurrent(fmtRange(cur.start, cur.end, s.date)));
-        useUi.getState().setNotice(lines.join(' '));
+        // Celah yang seluruhnya jatuh di jeda antar-blok tidak memengaruhi data: tidak perlu diberitahukan.
+        if (lines.length > 1) useUi.getState().setNotice(lines.join(' '));
       } else {
         const last = r.closed.at(-1);
         if (last) {

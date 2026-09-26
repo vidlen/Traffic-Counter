@@ -1,14 +1,14 @@
 # PROGRESS — TC Counter
 
-| Milestone                       | Tanggal    | Status  |
-| ------------------------------- | ---------- | ------- |
-| M0 — Fondasi & deploy           | 26/09/2026 | Selesai |
-| M1 — Klasifikasi                | 26/09/2026 | Selesai |
-| M2 — Wizard sesi & jadwal       | 26/09/2026 | Selesai |
-| M3 — Layar hitung & mesin timer | 27/09/2026 | Selesai |
-| M4 — Rekap di app               | 27/09/2026 | Selesai |
-| M5 — Export Excel               | 27/09/2026 | Selesai |
-| M6 — Pengerasan lapangan        |            | Belum   |
+| Milestone                       | Tanggal    | Status                              |
+| ------------------------------- | ---------- | ----------------------------------- |
+| M0 — Fondasi & deploy           | 26/09/2026 | Selesai                             |
+| M1 — Klasifikasi                | 26/09/2026 | Selesai                             |
+| M2 — Wizard sesi & jadwal       | 26/09/2026 | Selesai                             |
+| M3 — Layar hitung & mesin timer | 27/09/2026 | Selesai                             |
+| M4 — Rekap di app               | 27/09/2026 | Selesai                             |
+| M5 — Export Excel               | 27/09/2026 | Selesai                             |
+| M6 — Pengerasan lapangan        | 27/09/2026 | Kode selesai, uji lapangan menunggu |
 
 ---
 
@@ -221,3 +221,49 @@
 - [ ] Ubah ekr di Klasifikasi → skr berubah di Data_Interval & Rekap_Jam
 - [ ] Data_Gabung dari 2 HP bisa digabung lalu dibuat PivotTable
 - [ ] Bagikan ke WhatsApp dan Drive dari HP
+
+---
+
+## M6 — Pengerasan lapangan (27/09/2026)
+
+**Dibuat / diperbaiki**
+
+- Peringatan penyimpanan di Beranda: ruang hampir penuh (> 80% kuota), atau penyimpanan belum persisten saat ada sesi yang belum di-export (tombol "Lindungi data"). Status yang sama di Pengaturan.
+- Ketukan kini ditulis **langsung** ke IndexedDB tanpa antre (ditemukan saat uji: ketukan terakhir bisa hilang bila halaman langsung di-reload). Uji: 5 ketukan cepat lalu reload → kelimanya tersimpan.
+- Pemberitahuan pemulihan hanya muncul bila ada interval yang terdampak (celah di jeda antar-blok tidak mengganggu).
+- Label aksesibilitas tombol hitung menyebut aliran ("SM LT: 3"); kontrol segmen lebih kontras di tema gelap; label tab tidak terbungkus.
+- README berisi panduan pengguna berbahasa Indonesia. Versi app 1.0.0.
+- Sudah tersedia dari milestone sebelumnya: badge "Belum di-export", Duplikat pengaturan sesi, kontras warna tombol teruji (≥ 4,5:1), tema terang kontras tinggi default.
+
+**Tes:** `npm test` 62 lulus · `npm run lint` bersih · `npm run build` OK (precache 21 file, 1,69 MB, termasuk ExcelJS untuk export offline).
+
+**Catatan uji otomatis vs lapangan:** latensi ketukan, getar, bunyi, Wake Lock, dan perilaku layar terkunci hanya bisa diukur di HP sungguhan. Desainnya: `pointerdown` (bukan `click`), pembaruan angka optimistis sebelum tulis DB, tombol di-memo sehingga hitung mundur tidak me-render ulang tombol.
+
+**Checklist uji lapangan (isi setelah dicoba)**
+
+| Uji                                                                 | Android Chrome | iOS Safari |
+| ------------------------------------------------------------------- | -------------- | ---------- |
+| Install ke layar utama, ikon & nama benar                           | [ ]            | [ ]        |
+| Terbuka offline (mode pesawat) setelah kunjungan pertama            | [ ]            | [ ]        |
+| Ketukan terasa instan, termasuk ketukan beruntun cepat              | [ ]            | [ ]        |
+| Dua tombol diketuk bersamaan → keduanya bertambah                   | [ ]            | [ ]        |
+| Getar tiap ketukan (iOS: klik suara)                                | [ ]            | [ ]        |
+| Bunyi 2× + getar saat interval tersimpan                            | [ ]            | [ ]        |
+| Layar tidak mati selama menghitung (Wake Lock)                      | [ ]            | [ ]        |
+| Terbaca di bawah matahari (tema terang, tombol Besar)               | [ ]            | [ ]        |
+| Refresh di tengah interval → hitungan utuh                          | [ ]            | [ ]        |
+| Kunci layar / pindah app > 15 s → TERPUTUS/TERLEWAT + pemberitahuan | [ ]            | [ ]        |
+| Blok waktu mulai otomatis tepat waktu                               | [ ]            | [ ]        |
+| Sesi 12 jam di Mode uji ×60 lancar                                  | [ ]            | [ ]        |
+| Badge "Belum di-export" hilang setelah export                       | [ ]            | [ ]        |
+| Bagikan ke WhatsApp / Drive                                         | [ ]            | [ ]        |
+| Excel terbuka benar di Excel, WPS, Google Sheets                    | [ ]            | [ ]        |
+| Duplikat pengaturan sesi                                            | [ ]            | [ ]        |
+| Peringatan penyimpanan tampil bila belum persisten                  | [ ]            | [ ]        |
+| Banner versi baru hanya di Beranda, tidak saat sesi aktif           | [ ]            | [ ]        |
+
+**Batasan yang diketahui**
+
+- Mesin interval tidak berjalan saat app tidak terlihat (keterbatasan browser); jeda dicatat lalu dipulihkan saat app dibuka lagi. Bunyi/getar mulai otomatis blok hanya terdengar bila app sedang terbuka.
+- Mengubah jam HP secara manual di tengah sesi tidak ditangani (gunakan jam otomatis).
+- Data hanya ada di HP yang dipakai; gabungkan antar-HP lewat sheet Data_Gabung.

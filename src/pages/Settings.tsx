@@ -1,8 +1,9 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { type ReactNode, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { AppBar, Page } from '../components/AppBar';
 import { Field, Segmented, Switch } from '../components/Form';
 import { saveSettings, useSettings } from '../hooks/useSettings';
+import { useStorageStatus } from '../hooks/useStorageStatus';
 import { t } from '../i18n/id';
 import { db } from '../lib/db';
 import { fmtNum } from '../lib/format';
@@ -22,25 +23,6 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 }
 
 const mb = (bytes: number) => `${fmtNum(bytes / 1024 / 1024, 1)} MB`;
-
-async function loadStorage(): Promise<{ persisted?: boolean; usage?: string }> {
-  const persisted = navigator.storage?.persisted ? await navigator.storage.persisted() : undefined;
-  const est = navigator.storage?.estimate ? await navigator.storage.estimate() : undefined;
-  return { persisted, usage: est?.quota ? ts.usage(mb(est.usage ?? 0), mb(est.quota)) : undefined };
-}
-
-function useStorageStatus() {
-  const [state, setState] = useState<{ persisted?: boolean; usage?: string }>({});
-  const [version, setVersion] = useState(0);
-  useEffect(() => {
-    let alive = true;
-    void loadStorage().then((v) => alive && setState(v));
-    return () => {
-      alive = false;
-    };
-  }, [version]);
-  return { ...state, refresh: () => setVersion((v) => v + 1) };
-}
 
 export function Settings() {
   const s = useSettings();
@@ -170,11 +152,15 @@ export function Settings() {
                   ? ts.persistedYes
                   : ts.persistedNo}
             </p>
-            {storage.usage && <p className="text-sm text-muted tabular-nums">{storage.usage}</p>}
+            {storage.quota !== undefined && (
+              <p className="text-sm text-muted tabular-nums">
+                {ts.usage(mb(storage.usage ?? 0), mb(storage.quota))}
+              </p>
+            )}
             {storage.persisted === false && (
               <button
                 className="btn btn-secondary mt-2 w-full"
-                onClick={() => void navigator.storage.persist().then(storage.refresh)}
+                onClick={() => void storage.request()}
               >
                 {ts.requestPersist}
               </button>

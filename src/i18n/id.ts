@@ -41,6 +41,10 @@ export const t = {
     deleteConfirm: 'Hapus permanen',
     cancel: 'Batal',
     deleted: 'Sesi dihapus',
+    storageFull: 'Ruang penyimpanan HP hampir penuh. Export sesi lama lalu hapus dari app.',
+    storageNotPersisted:
+      'Browser belum menjamin data survei tersimpan permanen. Export Excel setelah tiap sesi.',
+    storagePersist: 'Lindungi data',
   },
   classifications: {
     title: 'Klasifikasi kendaraan',

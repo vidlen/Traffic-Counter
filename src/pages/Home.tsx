@@ -5,6 +5,7 @@ import { BrandMark } from '../components/BrandMark';
 import { DeleteSessionDialog } from '../components/DeleteSessionDialog';
 import { ExportDialog } from '../components/ExportDialog';
 import { loadSettings } from '../hooks/useSettings';
+import { useStorageStatus } from '../hooks/useStorageStatus';
 import { t } from '../i18n/id';
 import { clock } from '../lib/clock';
 import { db } from '../lib/db';
@@ -42,9 +43,12 @@ export function Home() {
   const [toDelete, setToDelete] = useState<Session | null>(null);
   const [toExport, setToExport] = useState<Session | null>(null);
 
+  const storage = useStorageStatus();
+
   const active = sessions?.filter(isActive) ?? [];
   const drafts = sessions?.filter((s) => s.status === 'DRAFT') ?? [];
   const finished = sessions?.filter((s) => s.status === 'SELESAI') ?? [];
+  const unexported = [...active, ...finished].some((s) => !s.exportedAt && stats?.get(s.id));
 
   const duplicate = async (s: Session) => {
     const now = clock.now();
@@ -88,6 +92,22 @@ export function Home() {
             {t.pwa.reload}
           </button>
         </div>
+      )}
+
+      {storage.nearlyFull ? (
+        <p className="mt-6 rounded-xl bg-danger-soft p-4 text-sm font-semibold text-danger">
+          {th.storageFull}
+        </p>
+      ) : (
+        storage.persisted === false &&
+        unexported && (
+          <div className="mt-6 flex items-center gap-3 rounded-xl bg-parsial p-4">
+            <p className="flex-1 text-sm font-medium">{th.storageNotPersisted}</p>
+            <button className="btn btn-secondary shrink-0" onClick={() => void storage.request()}>
+              {th.storagePersist}
+            </button>
+          </div>
+        )
       )}
 
       <Link to="/sesi/baru" className="btn btn-primary mt-6 h-16 w-full text-lg">
