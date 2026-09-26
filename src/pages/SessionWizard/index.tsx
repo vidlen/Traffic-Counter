@@ -7,6 +7,8 @@ import { clock } from '../../lib/clock';
 import { db } from '../../lib/db';
 import { PRESETS } from '../../lib/presets';
 import { newSession } from '../../lib/session';
+import { startSession } from '../../lib/sessionActions';
+import { unlockAudio } from '../../hooks/useBeep';
 import { isoDate } from '../../lib/time';
 import { toast, useWizard } from '../../store';
 import type { Session } from '../../types';
@@ -80,19 +82,30 @@ export function SessionWizard() {
     }
     go(step + 1);
   };
-  const save = async () => {
+  const valid = () => {
     const bad = [1, 2, 3, 4].find((n) => stepErrors(n, draft).length);
-    if (bad) {
-      go(bad);
-      setShowErrors(true);
-      toast(tw.fixErrors, 'danger');
-      return;
-    }
+    if (!bad) return true;
+    go(bad);
+    setShowErrors(true);
+    toast(tw.fixErrors, 'danger');
+    return false;
+  };
+  const save = async () => {
+    if (!valid()) return;
     await db.sessions.put({ ...draft, status: 'DRAFT' });
     void requestPersist();
     setDraft(null);
     toast(tw.draftSaved);
     navigate('/');
+  };
+  const start = async () => {
+    if (!valid()) return;
+    unlockAudio(); // gesture pengguna: izinkan bunyi akhir interval
+    const error = await startSession({ ...draft, status: 'DRAFT' });
+    if (error) return toast(error, 'danger');
+    void requestPersist();
+    setDraft(null);
+    navigate(`/sesi/${draft.id}`, { replace: true });
   };
 
   return (
@@ -122,9 +135,14 @@ export function SessionWizard() {
               {tw.next}
             </button>
           ) : (
-            <button className="btn btn-primary flex-[2]" onClick={() => void save()}>
-              {tw.saveDraft}
-            </button>
+            <>
+              <button className="btn btn-secondary flex-1" onClick={() => void save()}>
+                {tw.saveDraft}
+              </button>
+              <button className="btn btn-accent flex-1" onClick={() => void start()}>
+                {tw.start}
+              </button>
+            </>
           )}
         </div>
       </nav>

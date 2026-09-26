@@ -23,6 +23,17 @@
   --color-parsial: var(--c-parsial);
   --color-terputus: var(--c-terputus);
   --color-terlewat: var(--c-terlewat);
+  --animate-bump: bump 140ms ease-out;
+
+  /* Umpan balik ketukan: angka membesar sesaat lalu kembali. */
+  @keyframes bump {
+    from {
+      transform: scale(1.18);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
 }
 
 :root {

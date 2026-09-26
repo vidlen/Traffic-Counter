@@ -5,7 +5,7 @@
 | M0 — Fondasi & deploy           | 26/09/2026 | Selesai |
 | M1 — Klasifikasi                | 26/09/2026 | Selesai |
 | M2 — Wizard sesi & jadwal       | 26/09/2026 | Selesai |
-| M3 — Layar hitung & mesin timer |            | Belum   |
+| M3 — Layar hitung & mesin timer | 27/09/2026 | Selesai |
 | M4 — Rekap di app               |            | Belum   |
 | M5 — Export Excel               |            | Belum   |
 | M6 — Pengerasan lapangan        |            | Belum   |
@@ -111,3 +111,47 @@
 - [ ] Pratinjau jadwal sesuai (Mulai sekarang, Blok, lewat tengah malam)
 - [ ] Draf tersimpan, bisa dilanjutkan (edit), diduplikat, dihapus
 - [ ] Tombol back HP kembali ke langkah sebelumnya
+
+---
+
+## M3 — Layar hitung & mesin timer (27/09/2026)
+
+**Dibuat**
+
+- `lib/engine.ts` (fungsi murni): status interval LENGKAP/PARSIAL/TERPUTUS/TERLEWAT dari jam mulai/selesai sesi + celah (digabung, tidak dihitung ganda), `closeInterval()`, fase sesi (MENUNGGU/BERJALAN/SELESAI, termasuk antar-blok dan mode manual), deteksi celah, pilihan target undo.
+- `lib/sessionActions.ts` (Dexie): mulai sesi (maks. satu sesi aktif), `advance()` idempoten (buka interval manual, tutup semua interval yang habis termasuk catch-up, perbarui status), catat celah, heartbeat, ketukan langsung ke IndexedDB, undo, catatan, "Mulai interval berikutnya", "Mulai sekarang saja", selesai lebih awal.
+- `useSessionEngine` dipasang di App (berjalan di semua halaman): tick 250 ms, heartbeat 5 s, celah bila jeda > 15 s, tutup interval otomatis + bunyi 2× + getar `[200,100,200]` + toast "Interval 07.15-07.30 tersimpan · 482 kend", mulai otomatis tepat waktu, pemberitahuan pemulihan ("App sempat tidak aktif ... ditandai TERPUTUS").
+- **Layar hitung**: header (lokasi, jam HP, interval x/y, rentang, hitung mundur dari timestamp, progres, total interval), grid ruas 1-2 arah (2 sub-kolom bila jenis > 7; saran landscape untuk 2 arah), grid simpang (baris jenis × kolom gerakan, header gerakan menempel), tombol `pointerdown` multi-sentuh min. 56/72/88 px, angka besar = interval ini, angka kecil = total sesi; Undo; Koreksi (tombol bergaris merah, mati sendiri 5 s, tidak bisa negatif); Catatan (bottom sheet 8 kategori, Lainnya dengan teks); menu dengan **Selesaikan sesi (tahan 2 detik)**; status MENUNGGU (tombol abu-abu + hitung mundur / Mulai interval berikutnya / Mulai sekarang saja); ringkasan saat SELESAI.
+- Ergonomi: Wake Lock (diminta ulang saat terlihat; saran bila tidak didukung), getar tiap ketukan (iOS: klik suara), bunyi Web Audio di-unlock saat Mulai, `beforeunload`, `overscroll-behavior: none`, tanpa seleksi teks/menu konteks, `touch-action: manipulation`.
+- **Mode uji** ×10/×60 (jam per sesi, disimpan sehingga tahan reload; banner merah MODE UJI di semua layar).
+- Halaman **Pengaturan** lengkap: ukuran tombol, getar, suara, tema terang kontras tinggi/gelap, default interval & klasifikasi, periode jam puncak, status penyimpanan persisten + pemakaian, versi app, Mode uji.
+
+**Tes:** `npm test` 38 lulus. Engine murni: ketukan tepat di `t = end` → interval berikutnya; undo tidak negatif & tidak menembus interval terkunci; celah di tengah → TERPUTUS dengan `gapMs` benar; celah penuh → TERLEWAT; mulai terlambat / selesai lebih awal → PARSIAL. Integrasi Dexie + jam palsu: simpan otomatis saat timer habis, hitungan utuh setelah "refresh", app tertutup melewati akhir jadwal → TERPUTUS/TERLEWAT + sesi SELESAI, tab tertutup 2 menit → TERPUTUS, sesi 12 jam di Mode uji ×60 → 48 interval LENGKAP, mode manual, satu sesi aktif.
+
+**Diuji di browser (emulasi HP):** wizard → Mulai → hitung mundur ke kelipatan jam → interval mulai otomatis → ketuk/undo/koreksi → toast interval tersimpan → sesi selesai sendiri; 5 ketukan cepat lalu langsung reload → kelimanya tersimpan.
+
+**Cara coba di HP**
+
+1. Pengaturan → Lanjutan → Mode uji ×60.
+2. Buat sesi (15 menit, Mulai sekarang, 48 interval) → Mulai. 12 jam virtual selesai dalam 12 menit.
+3. Uji: ketuk cepat dua tombol bersamaan, Undo, Koreksi, Catatan; refresh di tengah interval (hitungan harus utuh); tutup app 2 menit lalu buka lagi (muncul pemberitahuan dan interval ditandai TERPUTUS/TERLEWAT); kunci layar sebentar.
+
+**Menyimpang / keputusan (mohon dicek)**
+
+- Mesin hanya berjalan saat app **terlihat**. Jeda > 15 detik saat app tersembunyi (pindah app, layar terkunci, tab ditutup) dicatat sebagai celah → TERPUTUS/TERLEWAT. Jadi pindah ke WhatsApp > 15 s juga dihitung "tidak aktif".
+- Hanya satu sesi BERJALAN/MENUNGGU per HP.
+- Blok waktu: interval yang seluruhnya lewat sebelum tombol Mulai ditekan dicatat TERLEWAT (baris tetap ada di Excel, angka kosong).
+- Undo hanya membatalkan ketukan (TAP), bukan koreksi, dan dilewati bila hitungan tombol itu sudah 0.
+- "Mulai sekarang saja" menghitung ulang jadwal dari saat tombol ditekan (tidak menunggu kelipatan jam).
+- Mode per interval: tombol Mulai di wizard langsung membuka interval pertama (atau menunggu kelipatan jam bila opsi aktif).
+- Sesi yang selesai alami memakai `endedAt` = akhir interval terakhir.
+
+**Checklist uji M3 (di HP)**
+
+- [ ] Refresh di tengah interval → hitungan utuh
+- [ ] Tab/app ditutup 2 menit lalu dibuka → pemberitahuan, TERPUTUS/TERLEWAT benar
+- [ ] Sesi 12 jam di Mode uji ×60 lancar sampai selesai
+- [ ] Blok waktu mulai otomatis tepat waktu (getar + bunyi)
+- [ ] Dua tombol diketuk bersamaan → keduanya bertambah
+- [ ] Layar tidak mati selama menghitung (Wake Lock)
+- [ ] iPhone: klik suara sebagai pengganti getar

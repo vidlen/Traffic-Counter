@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { EngineState } from './lib/engine';
 import type { Session } from './types';
 
 // State UI global (bukan data survei — data survei ada di Dexie).
@@ -14,6 +15,8 @@ interface UiState {
   setUpdate: (updateReady: boolean, applyUpdate: () => void) => void;
   toasts: Toast[];
   toast: (text: string, tone?: Toast['tone']) => void;
+  notice: string | null; // pemberitahuan pemulihan (celah tidak aktif)
+  setNotice: (notice: string | null) => void;
 }
 
 let nextToastId = 1;
@@ -22,6 +25,8 @@ export const useUi = create<UiState>((set) => ({
   updateReady: false,
   applyUpdate: () => {},
   setUpdate: (updateReady, applyUpdate) => set({ updateReady, applyUpdate }),
+  notice: null,
+  setNotice: (notice) => set({ notice }),
   toasts: [],
   toast: (text, tone = 'info') => {
     const id = nextToastId++;
@@ -31,6 +36,15 @@ export const useUi = create<UiState>((set) => ({
 }));
 
 export const toast = (text: string, tone?: Toast['tone']) => useUi.getState().toast(text, tone);
+
+// Denyut mesin interval (diperbarui tiap 250 ms oleh useSessionEngine).
+export interface EngineTick {
+  sessionId: string;
+  state: EngineState;
+  now: number;
+}
+
+export const useEngine = create<{ tick: EngineTick | null }>(() => ({ tick: null }));
 
 // Draf wizard sesi: bertahan saat pindah langkah / halaman, dibuang setelah disimpan.
 interface WizardState {

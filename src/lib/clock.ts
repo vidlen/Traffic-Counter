@@ -12,6 +12,10 @@ export const clock = {
   speed(): number {
     return anchor?.speed ?? 1;
   },
+  /** Jangkar baru untuk sesi Mode uji: waktu virtual mulai dari "sekarang". */
+  anchor(speed: number): ClockAnchor {
+    return { real: Date.now(), virtual: clock.now(), speed };
+  },
   /** Pasang jam dipercepat milik sesi Mode uji; null = kembali ke jam HP. */
   use(next: ClockAnchor | null): void {
     anchor = next;

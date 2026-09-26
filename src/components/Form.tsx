@@ -56,6 +56,41 @@ export function Segmented<T extends string | number>({
   );
 }
 
+export function Switch({
+  checked,
+  onChange,
+  label,
+  hint,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  hint?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex min-h-14 w-full items-center gap-4 py-2 text-left"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium">{label}</span>
+        {hint && <span className="block text-sm text-muted">{hint}</span>}
+      </span>
+      <span
+        aria-hidden="true"
+        className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${checked ? 'bg-ink' : 'bg-line-strong'}`}
+      >
+        <span
+          className={`absolute top-1 left-1 size-6 rounded-full bg-surface transition-transform ${checked ? 'translate-x-6' : ''}`}
+        />
+      </span>
+    </button>
+  );
+}
+
 export function CheckRow({
   checked,
   onChange,
