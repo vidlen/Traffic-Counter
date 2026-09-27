@@ -43,7 +43,7 @@ export function StepClassification({ draft: d, patch }: StepProps) {
                     <span className="block font-semibold">{tpl.name}</span>
                     <span className="mt-2 flex flex-wrap gap-1">
                       {tpl.vehicleTypes.map((v) => (
-                        <VehicleChip key={v.code} code={v.code} color={v.color} />
+                        <VehicleChip key={v.code} v={v} />
                       ))}
                     </span>
                   </span>

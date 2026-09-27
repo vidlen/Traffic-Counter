@@ -298,3 +298,29 @@ Permintaan pemilik: layar hitung utama landscape seperti aplikasi hand counter (
 - [ ] Android: Mulai → layar penuh + terkunci landscape; keluar layar hitung → kembali normal
 - [ ] iPhone: putar manual ke landscape, tata letak menyesuaikan (termasuk notch kiri/kanan)
 - [ ] Dua ibu jari: SM/MP mudah dijangkau, tombol kecil tidak tertekan tidak sengaja
+
+---
+
+## Perubahan: tombol sama besar + logo kendaraan (27/09/2026)
+
+Permintaan pemilik: ukuran tombol dibuat sama besar agar mudah mengisi, dan tombol memakai logo.
+
+**Dibuat**
+
+- **Semua tombol hitung sama besar** di setiap tata letak. Landscape ruas: grid seragam per arah, jumlah kolom × baris dipilih `gridFor()` (`src/lib/layout.ts`) supaya tombol mendekati persegi dengan sel kosong sesedikit mungkin (PKJI 6 jenis = 3 × 2 per arah, Bina Marga 12 = 4 × 3, 1 arah = selebar layar). Grid diisi dari bawah: jenis pertama (mis. SM) di pojok bawah sisi luar dekat ibu jari; arah kanan dicerminkan. Simpang: kolom jenis sama lebar. Portrait: grid seragam seperti sebelumnya.
+- **Logo kendaraan** di tombol hitung, chip jenis (klasifikasi, wizard, rekap, grafik) dan pemilih "Logo di tombol" di editor klasifikasi (10 logo: motor, mobil, sedan, jip, minibus/van, bus, truk, truk gandeng, traktor, sepeda). Preset bawaan sudah diberi logo; jenis tanpa pilihan memakai logo padanan PKJI.
+- Isi tombol (kode, total sesi Σ, logo, angka) diskalakan ke ukuran tombol dengan _container query_: tombol lebih tinggi daripada lebar → logo di atas angka; lebih lebar → berdampingan. Tidak ada lagi varian tombol besar/kecil.
+- Pengaturan "Ukuran tombol hitung" kini berlaku sebagai tinggi minimum di portrait; di landscape tombol selalu mengisi layar (batas minimum di sana hanya membuat tombol bertumpuk di layar pendek).
+
+**Dependency baru:** `@phosphor-icons/react` 2.1.10 (MIT), atas permintaan pemilik ("pakai logo"). Hanya ikon yang dipakai yang ikut ter-bundle.
+
+**Diuji di browser:** landscape 844 × 390, semua tombol berukuran identik: PKJI 2 arah 120 × 149 px, Bina Marga 2 arah 89 × 98 px (angka 4 digit tetap muat), simpang 4 gerakan × 6 jenis 112 × 78 px; portrait 375 × 812 PKJI 2 arah 176 × 91 px. `npm test` 65 lulus (tambahan: `gridFor`, logo preset), lint & build bersih.
+
+**Catatan**
+
+- Sesi yang dibuat sebelum perubahan ini menyimpan salinan klasifikasi lama (tanpa logo): logo hanya tampil untuk jenis yang punya padanan PKJI. Sesi baru mendapat logo lengkap.
+
+**Checklist uji**
+
+- [ ] Dua ibu jari: semua tombol mudah dijangkau, tidak ada tombol tertekan tidak sengaja
+- [ ] Logo terbaca jelas di bawah terik (tema terang)

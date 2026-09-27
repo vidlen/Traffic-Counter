@@ -4,6 +4,8 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 /* HP dalam posisi landscape (tinggi layar pendek). */
 @custom-variant landscape-phone (@media (orientation: landscape) and (max-height: 520px));
+/* Tombol hitung yang lebih lebar daripada tingginya: ikon & angka berjajar (bukan bertumpuk). */
+@custom-variant tile-wide (@container (orientation: landscape));
 
 @theme inline {
   --font-sans:

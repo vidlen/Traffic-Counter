@@ -4,6 +4,7 @@ import { AppBar, Page } from '../components/AppBar';
 import { ExportDialog } from '../components/ExportDialog';
 import { HoldButton } from '../components/HoldButton';
 import { Sheet } from '../components/Sheet';
+import { VehicleIcon } from '../components/VehicleIcon';
 import { useBeforeUnload } from '../hooks/useBeforeUnload';
 import { useCounterSession } from '../hooks/useCounterSession';
 import {
@@ -18,7 +19,8 @@ import { useWakeLock, wakeLockSupported } from '../hooks/useWakeLock';
 import { t } from '../i18n/id';
 import { clock } from '../lib/clock';
 import { fmtNum } from '../lib/format';
-import { textOn } from '../lib/presets';
+import { gridFor } from '../lib/layout';
+import { iconOf, textOn } from '../lib/presets';
 import { countKey, type Flow, isActive } from '../lib/session';
 import { fmtClock, fmtCountdown, fmtRange, fmtTime } from '../lib/time';
 import { toast, useEngine } from '../store';
@@ -108,7 +110,8 @@ function CountingScreen({ c, s }: { c: Counter; s: Session }) {
   return (
     <div
       className="flex h-[100dvh] flex-col bg-canvas pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] select-none [-webkit-touch-callout:none]"
-      style={{ '--btn-h': BTN_H[settings.buttonSize] } as CSSProperties}
+      // Landscape: tombol selalu mengisi layar; batas minimum hanya membuat tombol bertumpuk.
+      style={{ '--btn-h': portrait ? BTN_H[settings.buttonSize] : '0px' } as CSSProperties}
       onContextMenu={(e) => e.preventDefault()}
     >
       {portrait ? (
@@ -354,8 +357,6 @@ function Waiting({ s, c }: { s: Session; c: Counter }) {
   );
 }
 
-type Variant = 'wide' | 'big' | 'compact';
-
 const CounterButton = memo(function CounterButton({
   v,
   flowKey,
@@ -364,7 +365,6 @@ const CounterButton = memo(function CounterButton({
   total,
   disabled,
   correction,
-  variant = 'wide',
   mirror,
   onTap,
 }: {
@@ -375,17 +375,15 @@ const CounterButton = memo(function CounterButton({
   total: number;
   disabled: boolean;
   correction: boolean;
-  variant?: Variant;
-  mirror?: boolean; // sisi kanan landscape: angka di sisi dalam (kiri)
+  mirror?: boolean; // sisi kanan landscape: kode di sisi luar, angka di sisi dalam
   onTap: (flowKey: string, code: string) => void;
 }) {
-  const row = mirror ? 'flex-row-reverse' : '';
   return (
     <button
       type="button"
       disabled={disabled}
       aria-label={`${v.code} ${flowLabel}: ${count}`}
-      className="relative flex h-full min-h-[var(--btn-h)] w-full touch-manipulation flex-col justify-between overflow-hidden rounded-xl px-3 py-2 text-left transition-transform duration-75 active:scale-[0.97] active:brightness-90 disabled:opacity-30 disabled:saturate-0"
+      className="relative block h-full min-h-[var(--btn-h)] w-full touch-manipulation overflow-hidden rounded-xl transition-transform duration-75 active:scale-[0.97] active:brightness-90 disabled:opacity-30 disabled:saturate-0"
       style={{ background: v.color, color: textOn(v.color) }}
       onPointerDown={(e) => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -399,45 +397,36 @@ const CounterButton = memo(function CounterButton({
           className="pointer-events-none absolute inset-0 rounded-xl border-4 border-dashed border-white/90 bg-[repeating-linear-gradient(135deg,rgb(180_35_24/0.55)_0_10px,transparent_10px_20px)]"
         />
       )}
-      {variant === 'compact' ? (
-        <>
-          {/* Dua baris saja (kode + total, lalu angka) supaya muat di tombol kecil 56 px. */}
-          <span
-            className={`relative flex items-baseline justify-between gap-1 leading-none ${row}`}
-          >
-            <span className="text-sm font-bold">{v.code}</span>
-            <span className="text-xs tabular-nums opacity-85">{fmtNum(total)}</span>
+      {/* Isi diskalakan ke ukuran tombol (container query), jadi satu tata letak untuk semua layar. */}
+      <span className="absolute inset-0 flex flex-col px-2 py-1.5 text-left [container-type:size]">
+        <span
+          className={`flex items-baseline justify-between gap-1.5 leading-none ${mirror ? 'flex-row-reverse' : ''}`}
+        >
+          <span className="shrink-0 text-[length:clamp(0.75rem,12cqmin,1.25rem)] font-bold">
+            {v.code}
           </span>
+          <span className="hidden min-w-0 flex-1 truncate text-xs opacity-85 @min-[16rem]:block">
+            {v.name}
+          </span>
+          <span className="hidden min-w-0 truncate text-xs tabular-nums opacity-85 @min-[4.5rem]:block">
+            Σ {fmtNum(total)}
+          </span>
+        </span>
+        <span
+          className={`flex min-h-0 flex-1 flex-col items-center justify-center gap-[2cqh] tile-wide:gap-[5cqw] ${mirror ? 'tile-wide:flex-row-reverse' : 'tile-wide:flex-row'}`}
+        >
+          <VehicleIcon
+            icon={iconOf(v)}
+            className="size-[min(36cqh,60cqw)] shrink-0 tile-wide:size-[min(54cqh,30cqw)]"
+          />
           <span
             key={count}
-            className="relative animate-bump text-center text-3xl leading-none font-bold tabular-nums"
+            className="animate-bump text-[length:min(30cqh,48cqw)] leading-none font-bold tabular-nums tile-wide:text-[length:min(50cqh,26cqw)]"
           >
             {count}
           </span>
-        </>
-      ) : (
-        <>
-          <span className={`relative flex items-start justify-between gap-2 ${row}`}>
-            <span
-              className={`leading-none font-bold ${variant === 'big' ? 'text-2xl' : 'text-xl'}`}
-            >
-              {v.code}
-            </span>
-            <span
-              key={count}
-              className={`animate-bump leading-none font-bold tabular-nums ${variant === 'big' ? 'text-5xl' : 'text-3xl'}`}
-            >
-              {count}
-            </span>
-          </span>
-          <span
-            className={`relative flex items-end justify-between gap-2 text-xs leading-tight opacity-90 ${row}`}
-          >
-            <span className="truncate">{v.name}</span>
-            <span className="shrink-0 tabular-nums">Σ {fmtNum(total)}</span>
-          </span>
-        </>
-      )}
+        </span>
+      </span>
     </button>
   );
 });
@@ -447,14 +436,12 @@ function Cell({
   f,
   v,
   disabled,
-  variant,
   mirror,
 }: {
   c: Counter;
   f: Flow;
   v: VehicleType;
   disabled: boolean;
-  variant?: Variant;
   mirror?: boolean;
 }) {
   const key = countKey(f.positionKey, f.movement, v.code);
@@ -467,7 +454,6 @@ function Cell({
       total={c.sessionTotal(key)}
       disabled={disabled}
       correction={c.correction}
-      variant={variant}
       mirror={mirror}
       onTap={c.tap}
     />
@@ -475,9 +461,9 @@ function Cell({
 }
 
 /**
- * Landscape ruas (satu arah per panel, panel kanan dicerminkan):
- * jenis lain = tombol kecil di atas; dua jenis pertama (paling sering, mis. SM & MP) =
- * tombol besar di bawah, SM paling bawah (dekat ibu jari).
+ * Landscape ruas: satu arah per panel, semua tombol sama besar. Diisi dari bawah, jadi jenis
+ * pertama (paling sering, mis. SM) ada di pojok bawah sisi luar dekat ibu jari; panel kanan
+ * dicerminkan.
  */
 function LandscapePanel({
   c,
@@ -492,45 +478,34 @@ function LandscapePanel({
   disabled: boolean;
   mirror?: boolean;
 }) {
-  const small = types.slice(2);
-  const big = types.slice(0, 2).reverse(); // jenis pertama paling bawah
-  const perRow = c.flows.length === 2 ? 5 : 8;
-  const smallRows = Math.ceil(small.length / perRow);
-  const cols = smallRows ? Math.ceil(small.length / smallRows) : 1;
-  const rows = [
-    'auto',
-    ...Array.from({ length: smallRows }, () => 'minmax(var(--btn-h),1fr)'),
-    ...big.map((_, i) => `minmax(var(--btn-h),${i === big.length - 1 ? 1.9 : 1.5}fr)`),
-  ].join(' ');
+  const { cols, rows } = gridFor(types.length, c.flows.length === 2 ? 1.25 : 2.6);
   return (
-    <section className="grid min-h-0 min-w-0 gap-1.5" style={{ gridTemplateRows: rows }}>
+    <section className="flex min-h-0 min-w-0 flex-col gap-1.5">
       <h2 className={`truncate px-1 text-sm leading-tight font-bold ${mirror ? 'text-right' : ''}`}>
         {f.label}
       </h2>
-      {smallRows > 0 && (
-        <div
-          className={`grid gap-1.5 ${mirror ? '[direction:rtl]' : ''}`}
-          style={{
-            gridRow: `span ${smallRows}`,
-            gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))`,
-            gridTemplateRows: `repeat(${smallRows}, minmax(0,1fr))`,
-          }}
-        >
-          {small.map((v) => (
-            <div key={v.code} className="min-w-0 [direction:ltr]">
-              <Cell c={c} f={f} v={v} disabled={disabled} variant="compact" mirror={mirror} />
-            </div>
-          ))}
-        </div>
-      )}
-      {big.map((v) => (
-        <Cell key={v.code} c={c} f={f} v={v} disabled={disabled} variant="big" mirror={mirror} />
-      ))}
+      <div
+        className={`grid min-h-0 flex-1 gap-1.5 ${mirror ? '[direction:rtl]' : ''}`}
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))`,
+          gridTemplateRows: `repeat(${rows}, minmax(0,1fr))`,
+        }}
+      >
+        {types.map((v, i) => (
+          <div
+            key={v.code}
+            className="min-w-0 [direction:ltr]"
+            style={{ gridRow: rows - Math.floor(i / cols), gridColumn: (i % cols) + 1 }}
+          >
+            <Cell c={c} f={f} v={v} disabled={disabled} mirror={mirror} />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
 
-/** Landscape simpang: baris = gerakan, kolom = jenis (dua jenis pertama lebih lebar). */
+/** Landscape simpang: baris = gerakan, kolom = jenis; semua tombol sama besar. */
 function SimpangLandscape({
   c,
   types,
@@ -540,19 +515,18 @@ function SimpangLandscape({
   types: VehicleType[];
   disabled: boolean;
 }) {
-  const widths = types.map((_, i) => (i === 0 ? '1.6fr' : i === 1 ? '1.35fr' : '1fr'));
   return (
     <div
       className="grid min-h-0 min-w-0 gap-1.5"
       style={{
-        gridTemplateColumns: `2.5rem ${widths.map((w) => `minmax(0,${w})`).join(' ')}`,
-        gridTemplateRows: `repeat(${c.flows.length}, minmax(var(--btn-h),1fr))`,
+        gridTemplateColumns: `2.5rem repeat(${types.length}, minmax(0,1fr))`,
+        gridTemplateRows: `repeat(${c.flows.length}, minmax(0,1fr))`,
       }}
     >
       {c.flows.map((f) => (
         <Row key={f.key} label={f.label} arrow={MOVE_ARROW[f.movement ?? '']}>
           {types.map((v) => (
-            <Cell key={v.code} c={c} f={f} v={v} disabled={disabled} variant="compact" />
+            <Cell key={v.code} c={c} f={f} v={v} disabled={disabled} />
           ))}
         </Row>
       ))}
@@ -638,9 +612,7 @@ function SimpangGrid({
         </div>
       ))}
       {types.map((v) =>
-        c.flows.map((f) => (
-          <Cell key={f.key + v.code} c={c} f={f} v={v} disabled={disabled} variant="compact" />
-        )),
+        c.flows.map((f) => <Cell key={f.key + v.code} c={c} f={f} v={v} disabled={disabled} />),
       )}
     </div>
   );

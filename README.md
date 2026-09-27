@@ -19,8 +19,8 @@ Alamat: **https://vidlen.github.io/Traffic-Counter/**
 
 ### 2. Sebelum survei
 
-1. **Klasifikasi kendaraan** (menu di Beranda): pilih preset PKJI 2023, PKJI 2023 Perkotaan, Bina Marga Gol. 1-8, atau Sederhana. Preset tidak bisa diubah; tekan _Duplikat_ untuk membuat versi sendiri (tambah/hapus jenis, ubah kode, warna, ekr, urutan).
-2. **Pengaturan:** ukuran tombol (Besar/Sangat besar untuk di lapangan), getar, suara, tema, batas periode jam puncak.
+1. **Klasifikasi kendaraan** (menu di Beranda): pilih preset PKJI 2023, PKJI 2023 Perkotaan, Bina Marga Gol. 1-8, atau Sederhana. Preset tidak bisa diubah; tekan _Duplikat_ untuk membuat versi sendiri (tambah/hapus jenis, ubah kode, logo, warna, ekr, urutan).
+2. **Pengaturan:** ukuran tombol untuk posisi portrait, getar, suara, tema, batas periode jam puncak.
 3. **Buat sesi baru** (5 langkah):
    - _Info_: lokasi, tanggal, surveyor, tipe jalan, cuaca.
    - _Tipe & posisi_: ruas (1-2 arah dihitung di HP ini) atau simpang (1 lengan per HP + gerakan LT/ST/RT/UT).
@@ -31,9 +31,9 @@ Alamat: **https://vidlen.github.io/Traffic-Counter/**
 
 ### 3. Saat menghitung
 
-- **Tata letak utama: landscape.** Pegang HP menyamping dengan dua tangan. Ruas 2 arah: Arah A di kiri, Arah B di kanan, posisi tombol dicerminkan. **Dua jenis pertama** pada klasifikasi (mis. SM & MP) menjadi tombol besar di bawah (dekat ibu jari), jenis lain tombol kecil di atas. Undo / Koreksi / Catatan ada di kolom tengah. Simpang: baris = gerakan (LT/ST/RT), kolom = jenis. Urutan jenis bisa diatur di editor klasifikasi.
+- **Tata letak utama: landscape.** Pegang HP menyamping dengan dua tangan. **Semua tombol sama besar** dan memakai logo kendaraan. Ruas 2 arah: Arah A di kiri, Arah B di kanan, posisi tombol dicerminkan; jenis pertama klasifikasi (mis. SM) ada di pojok bawah sisi luar, dekat ibu jari. Undo / Koreksi / Catatan ada di kolom tengah. Simpang: baris = gerakan (LT/ST/RT/UT), kolom = jenis. Urutan jenis dan logo bisa diatur di editor klasifikasi.
 - Di Android, app otomatis masuk layar penuh dan terkunci landscape saat menekan _Mulai_ / _Lanjutkan_ (bisa dimatikan di Pengaturan). Di iPhone putar HP sendiri. Posisi portrait tetap bisa dipakai.
-- Ketuk tombol jenis kendaraan: angka besar = interval ini, angka kecil = total sesi. Dua tombol boleh diketuk bersamaan.
+- Ketuk tombol jenis kendaraan: angka besar = interval ini, angka kecil (Σ) = total sesi. Dua tombol boleh diketuk bersamaan.
 - **Undo**: membatalkan ketukan terakhir di interval berjalan.
 - **Koreksi**: aktifkan, lalu setiap ketukan mengurangi 1 (tombol bergaris merah; mati sendiri setelah 5 detik).
 - **Catatan**: hujan, kecelakaan, macet, APILL mati, dll. Sekali ketuk langsung tersimpan dengan jamnya.
@@ -68,8 +68,7 @@ _Pengaturan → Lanjutan → Mode uji_ (×10 atau ×60) untuk mencoba alur 15 me
 
 ### 7. Tips lapangan
 
-- Di bawah terik: tema terang kontras tinggi, ukuran tombol Besar/Sangat besar.
-- Ruas 2 arah dengan banyak jenis: putar HP ke landscape.
+- Di bawah terik: tema terang kontras tinggi; hitung dalam posisi landscape (tombol paling besar).
 - Bawa power bank; layar dijaga tetap menyala selama menghitung.
 - Semua HP dalam satu tim memakai jam otomatis agar interval selaras.
 

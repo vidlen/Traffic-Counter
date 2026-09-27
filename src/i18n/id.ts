@@ -85,6 +85,18 @@ export const t = {
     blockOverlap:
       'Blok waktu tumpang tindih atau urutannya salah (rentang total lebih dari 24 jam).',
   },
+  icons: {
+    motor: 'Sepeda motor',
+    mobil: 'Mobil',
+    sedan: 'Sedan',
+    jip: 'Jip',
+    van: 'Minibus / van',
+    bus: 'Bus',
+    truk: 'Truk',
+    trailer: 'Truk gandeng / trailer',
+    traktor: 'Traktor',
+    sepeda: 'Sepeda / tidak bermotor',
+  },
   wizard: {
     titleNew: 'Sesi baru',
     titleEdit: 'Edit draf sesi',
@@ -479,6 +491,7 @@ export const t = {
     none: 'Tidak ada',
     color: 'Warna tombol',
     colorN: (n: number) => `Warna ${n}`,
+    icon: 'Logo di tombol',
     moveUp: 'Naikkan',
     moveDown: 'Turunkan',
     remove: 'Hapus jenis',
@@ -494,6 +507,8 @@ export const t = {
     version: 'Versi app',
     display: 'Tampilan & umpan balik',
     buttonSize: 'Ukuran tombol hitung',
+    buttonSizeHint:
+      'Tinggi minimum tombol di posisi portrait. Di landscape semua tombol sama besar dan mengisi layar.',
     sizes: { NORMAL: 'Normal', BESAR: 'Besar', SANGAT_BESAR: 'Sangat besar' },
     lockLandscape: 'Layar penuh & landscape saat menghitung',
     lockLandscapeHint:

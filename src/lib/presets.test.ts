@@ -4,6 +4,7 @@ import { TcDatabase } from './db';
 import {
   ERR,
   fillEkrFromPkji,
+  iconOf,
   MAX_VEHICLE_TYPES,
   PRESETS,
   textOn,
@@ -65,6 +66,13 @@ describe('preset klasifikasi', () => {
       const [a, b] = [lum(color), lum(textOn(color))].sort((x, y) => y - x);
       expect((a + 0.05) / (b + 0.05)).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it('setiap jenis bawaan punya logo; tanpa pilihan, logo ikut padanan PKJI', () => {
+    for (const p of PRESETS) for (const v of p.vehicleTypes) expect(iconOf(v)).toBeDefined();
+    expect(iconOf({ pkji: 'BB' })).toBe('bus');
+    expect(iconOf({ icon: 'traktor', pkji: 'BB' })).toBe('traktor');
+    expect(iconOf({})).toBeUndefined();
   });
 
   it('di-seed ke Dexie saat DB dibuka', async () => {

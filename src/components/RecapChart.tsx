@@ -121,7 +121,7 @@ export default function RecapChart({
               onClick={() => toggle(v.code)}
               className={`rounded-lg transition-opacity ${selected.includes(v.code) ? '' : 'opacity-30'}`}
             >
-              <VehicleChip code={v.code} color={v.color} />
+              <VehicleChip v={v} />
             </button>
           ))}
           <button

@@ -49,6 +49,7 @@ export function Settings() {
                 )}
                 onChange={(buttonSize) => set({ buttonSize })}
               />
+              <p className="text-sm text-muted">{ts.buttonSizeHint}</p>
             </div>
             <div className="space-y-2">
               <p className="font-medium">{ts.theme}</p>

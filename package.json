@@ -16,6 +16,7 @@
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "chart.js": "^4.5.1",
     "date-fns": "^4.4.0",
     "dexie": "^4.4.6",

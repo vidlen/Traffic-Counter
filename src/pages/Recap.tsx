@@ -438,7 +438,7 @@ function Composition({ values, r }: { values: Record<string, number | null>; r: 
         .filter((v) => values[v.code])
         .map((v) => (
           <span key={v.code} className="flex items-center gap-1.5 text-sm tabular-nums">
-            <VehicleChip code={v.code} color={v.color} />
+            <VehicleChip v={v} />
             {pct(values[v.code])}
           </span>
         ))}

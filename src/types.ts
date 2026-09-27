@@ -3,11 +3,25 @@ export type PkjiClass = 'SM' | 'MP' | 'KS' | 'BB' | 'TB' | 'KTB';
 export type Movement = 'LT' | 'ST' | 'RT' | 'UT';
 export type SurveyType = 'RUAS' | 'SIMPANG';
 
+/** Ikon tombol hitung (logo kendaraan). */
+export type VehicleIcon =
+  | 'motor'
+  | 'mobil'
+  | 'sedan'
+  | 'jip'
+  | 'van'
+  | 'bus'
+  | 'truk'
+  | 'trailer'
+  | 'traktor'
+  | 'sepeda';
+
 export interface VehicleType {
   code: string; // 'SM', 'MP', 'G5a' — unik, 1–5 karakter
   name: string;
   description?: string;
   color: string; // hex, untuk tombol
+  icon?: VehicleIcon; // kosong = ikon mengikuti padanan PKJI
   ekr: number | null; // null = belum diisi
   inSkr: boolean; // false untuk KTB / kendaraan yang tidak dikonversi
   pkji?: PkjiClass; // padanan ke kelas PKJI (opsional)

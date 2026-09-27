@@ -3,17 +3,20 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { AppBar, Page } from '../components/AppBar';
 import { VehicleChip } from '../components/VehicleChip';
+import { VehicleIcon } from '../components/VehicleIcon';
 import { t } from '../i18n/id';
 import { clock } from '../lib/clock';
 import { db } from '../lib/db';
 import { fmtEkr, parseDecimal } from '../lib/format';
 import {
   copyOf,
+  iconOf,
   MAX_VEHICLE_TYPES,
   PKJI_CLASSES,
   type TemplateError,
   validateTemplate,
   VEHICLE_COLORS,
+  VEHICLE_ICONS,
 } from '../lib/presets';
 import { toast } from '../store';
 import type { ClassificationTemplate, PkjiClass, VehicleType } from '../types';
@@ -155,7 +158,7 @@ function Editor({ initial }: { initial: ClassificationTemplate }) {
                       onClick={() => setOpenKey(open ? null : r.key)}
                       aria-expanded={open}
                     >
-                      <VehicleChip code={r.type.code} color={r.type.color} />
+                      <VehicleChip v={r.type} />
                       <span className="min-w-0 flex-1 truncate font-medium">
                         {r.type.name || te.untitled}
                       </span>
@@ -303,6 +306,27 @@ function TypeFields({
         />
         <span className="font-medium">{te.inSkr}</span>
       </label>
+      <div className="space-y-2">
+        <span className="label">{te.icon}</span>
+        <div className="grid grid-cols-5 gap-2">
+          {VEHICLE_ICONS.map((key) => (
+            <button
+              key={key}
+              type="button"
+              aria-label={t.icons[key]}
+              aria-pressed={iconOf(v) === key}
+              className={`flex aspect-square items-center justify-center rounded-lg border ${
+                iconOf(v) === key
+                  ? 'border-ink bg-ink text-canvas'
+                  : 'border-line-strong bg-surface text-ink'
+              }`}
+              onClick={() => onPatch({ icon: key })}
+            >
+              <VehicleIcon icon={key} className="size-8" />
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="space-y-2">
         <span className="label">{te.color}</span>
         <div className="grid grid-cols-7 gap-2">

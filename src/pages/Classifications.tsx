@@ -47,7 +47,7 @@ export function Classifications() {
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {tpl.vehicleTypes.map((v) => (
-          <VehicleChip key={v.code} code={v.code} color={v.color} />
+          <VehicleChip key={v.code} v={v} />
         ))}
       </div>
       <div className="mt-4 flex gap-2">

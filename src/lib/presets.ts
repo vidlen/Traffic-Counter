@@ -1,5 +1,5 @@
 import { t } from '../i18n/id';
-import type { ClassificationTemplate, PkjiClass, VehicleType } from '../types';
+import type { ClassificationTemplate, PkjiClass, VehicleIcon, VehicleType } from '../types';
 
 // Warna tombol: gelap-jenuh (teks putih, kontras ≥ 4,5:1) supaya terbaca di bawah matahari.
 // Urutan dipilih agar tombol bersebelahan berbeda jelas.
@@ -23,14 +23,47 @@ export const VEHICLE_COLORS = [
 export const PKJI_CLASSES: PkjiClass[] = ['SM', 'MP', 'KS', 'BB', 'TB', 'KTB'];
 export const MAX_VEHICLE_TYPES = 14;
 
-type Row = [code: string, name: string, description: string, color: string, pkji?: PkjiClass];
+export const VEHICLE_ICONS: VehicleIcon[] = [
+  'motor',
+  'mobil',
+  'sedan',
+  'jip',
+  'van',
+  'bus',
+  'truk',
+  'trailer',
+  'traktor',
+  'sepeda',
+];
+const PKJI_ICON: Record<PkjiClass, VehicleIcon> = {
+  SM: 'motor',
+  MP: 'mobil',
+  KS: 'van',
+  BB: 'bus',
+  TB: 'truk',
+  KTB: 'sepeda',
+};
+
+/** Ikon jenis: pilihan pengguna, atau mengikuti padanan PKJI (jenis/sesi lama tanpa ikon). */
+export const iconOf = (v: Pick<VehicleType, 'icon' | 'pkji'>): VehicleIcon | undefined =>
+  v.icon ?? (v.pkji ? PKJI_ICON[v.pkji] : undefined);
+
+type Row = [
+  code: string,
+  name: string,
+  description: string,
+  color: string,
+  icon: VehicleIcon,
+  pkji?: PkjiClass,
+];
 
 function types(rows: Row[], opts: { mp1?: boolean; notInSkr: string[] }): VehicleType[] {
-  return rows.map(([code, name, description, color, pkji], order) => ({
+  return rows.map(([code, name, description, color, icon, pkji], order) => ({
     code,
     name,
     description,
     color,
+    icon,
     // ekr tidak di-hardcode: hanya MP = 1,00 di preset PKJI, sisanya diisi pengguna.
     ekr: opts.mp1 && code === 'MP' ? 1 : null,
     inSkr: !opts.notInSkr.includes(code),
@@ -50,12 +83,19 @@ export const PRESETS: ClassificationTemplate[] = [
     updatedAt: 0,
     vehicleTypes: types(
       [
-        ['SM', 'Sepeda motor', 'Kendaraan bermotor roda 2 dan 3', c[0], 'SM'],
-        ['MP', 'Mobil penumpang', 'Sedan, jip, minibus, pikap, truk kecil', c[1], 'MP'],
-        ['KS', 'Kendaraan sedang', 'Bus kecil/sedang, truk 2 sumbu 6 roda', c[2], 'KS'],
-        ['BB', 'Bus besar', 'Bus 2 atau 3 sumbu', c[3], 'BB'],
-        ['TB', 'Truk besar', 'Truk 3 sumbu atau lebih, gandengan, trailer', c[4], 'TB'],
-        ['KTB', 'Kendaraan tidak bermotor', 'Sepeda, becak, gerobak, kereta kuda', c[11], 'KTB'],
+        ['SM', 'Sepeda motor', 'Kendaraan bermotor roda 2 dan 3', c[0], 'motor', 'SM'],
+        ['MP', 'Mobil penumpang', 'Sedan, jip, minibus, pikap, truk kecil', c[1], 'mobil', 'MP'],
+        ['KS', 'Kendaraan sedang', 'Bus kecil/sedang, truk 2 sumbu 6 roda', c[2], 'van', 'KS'],
+        ['BB', 'Bus besar', 'Bus 2 atau 3 sumbu', c[3], 'bus', 'BB'],
+        ['TB', 'Truk besar', 'Truk 3 sumbu atau lebih, gandengan, trailer', c[4], 'truk', 'TB'],
+        [
+          'KTB',
+          'Kendaraan tidak bermotor',
+          'Sepeda, becak, gerobak, kereta kuda',
+          c[11],
+          'sepeda',
+          'KTB',
+        ],
       ],
       { mp1: true, notInSkr: ['KTB'] },
     ),
@@ -68,16 +108,24 @@ export const PRESETS: ClassificationTemplate[] = [
     updatedAt: 0,
     vehicleTypes: types(
       [
-        ['SM', 'Sepeda motor', 'Kendaraan bermotor roda 2 dan 3', c[0], 'SM'],
-        ['MP', 'Mobil penumpang', 'Sedan, jip, minibus, pikap, truk kecil', c[1], 'MP'],
+        ['SM', 'Sepeda motor', 'Kendaraan bermotor roda 2 dan 3', c[0], 'motor', 'SM'],
+        ['MP', 'Mobil penumpang', 'Sedan, jip, minibus, pikap, truk kecil', c[1], 'mobil', 'MP'],
         [
           'KS',
           'Kendaraan sedang',
           'Bus dan truk; bus besar & truk besar dicatat di sini',
           c[2],
+          'van',
           'KS',
         ],
-        ['KTB', 'Kendaraan tidak bermotor', 'Sepeda, becak, gerobak, kereta kuda', c[11], 'KTB'],
+        [
+          'KTB',
+          'Kendaraan tidak bermotor',
+          'Sepeda, becak, gerobak, kereta kuda',
+          c[11],
+          'sepeda',
+          'KTB',
+        ],
       ],
       { mp1: true, notInSkr: ['KTB'] },
     ),
@@ -90,18 +138,25 @@ export const PRESETS: ClassificationTemplate[] = [
     updatedAt: 0,
     vehicleTypes: types(
       [
-        ['G1', 'Sepeda motor', 'Sepeda motor, skuter, kendaraan roda 3', c[0], 'SM'],
-        ['G2', 'Sedan, jip', 'Sedan, jip, station wagon', c[1], 'MP'],
-        ['G3', 'Opelet, minibus', 'Opelet, pikap-opelet, suburban, kombi, minibus', c[5], 'MP'],
-        ['G4', 'Pikap, mikro truk', 'Pikap, mikro truk, mobil hantaran', c[9], 'MP'],
-        ['G5a', 'Bus kecil', 'Bus kecil', c[2], 'KS'],
-        ['G5b', 'Bus besar', 'Bus besar', c[3], 'BB'],
-        ['G6a', 'Truk ringan 2 sumbu', 'Truk ringan 2 sumbu', c[8], 'KS'],
-        ['G6b', 'Truk sedang 2 sumbu', 'Truk sedang 2 sumbu', c[10], 'KS'],
-        ['G7a', 'Truk 3 sumbu', 'Truk 3 sumbu', c[6], 'TB'],
-        ['G7b', 'Truk gandengan', 'Truk gandengan', c[4], 'TB'],
-        ['G7c', 'Truk semi trailer', 'Truk semi trailer', c[7], 'TB'],
-        ['G8', 'Tidak bermotor', 'Kendaraan tidak bermotor', c[11], 'KTB'],
+        ['G1', 'Sepeda motor', 'Sepeda motor, skuter, kendaraan roda 3', c[0], 'motor', 'SM'],
+        ['G2', 'Sedan, jip', 'Sedan, jip, station wagon', c[1], 'sedan', 'MP'],
+        [
+          'G3',
+          'Opelet, minibus',
+          'Opelet, pikap-opelet, suburban, kombi, minibus',
+          c[5],
+          'van',
+          'MP',
+        ],
+        ['G4', 'Pikap, mikro truk', 'Pikap, mikro truk, mobil hantaran', c[9], 'truk', 'MP'],
+        ['G5a', 'Bus kecil', 'Bus kecil', c[2], 'bus', 'KS'],
+        ['G5b', 'Bus besar', 'Bus besar', c[3], 'bus', 'BB'],
+        ['G6a', 'Truk ringan 2 sumbu', 'Truk ringan 2 sumbu', c[8], 'truk', 'KS'],
+        ['G6b', 'Truk sedang 2 sumbu', 'Truk sedang 2 sumbu', c[10], 'truk', 'KS'],
+        ['G7a', 'Truk 3 sumbu', 'Truk 3 sumbu', c[6], 'truk', 'TB'],
+        ['G7b', 'Truk gandengan', 'Truk gandengan', c[4], 'trailer', 'TB'],
+        ['G7c', 'Truk semi trailer', 'Truk semi trailer', c[7], 'trailer', 'TB'],
+        ['G8', 'Tidak bermotor', 'Kendaraan tidak bermotor', c[11], 'sepeda', 'KTB'],
       ],
       { notInSkr: ['G8'] },
     ),
@@ -114,11 +169,11 @@ export const PRESETS: ClassificationTemplate[] = [
     updatedAt: 0,
     vehicleTypes: types(
       [
-        ['MTR', 'Motor', 'Sepeda motor', c[0], 'SM'],
-        ['MBL', 'Mobil', 'Mobil penumpang dan pikap', c[1], 'MP'],
-        ['BUS', 'Bus', 'Semua bus', c[3]],
-        ['TRK', 'Truk', 'Semua truk', c[6]],
-        ['LAIN', 'Lainnya', 'Kendaraan lain / tidak bermotor', c[11]],
+        ['MTR', 'Motor', 'Sepeda motor', c[0], 'motor', 'SM'],
+        ['MBL', 'Mobil', 'Mobil penumpang dan pikap', c[1], 'mobil', 'MP'],
+        ['BUS', 'Bus', 'Semua bus', c[3], 'bus'],
+        ['TRK', 'Truk', 'Semua truk', c[6], 'truk'],
+        ['LAIN', 'Lainnya', 'Kendaraan lain / tidak bermotor', c[11], 'sepeda'],
       ],
       { notInSkr: ['LAIN'] },
     ),
